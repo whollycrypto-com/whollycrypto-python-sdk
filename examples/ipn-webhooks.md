@@ -50,6 +50,10 @@ Merchant 4.1.0 adds signed event identity, actual chain/token transfers, exact a
 | expires_at | timestamp | Invoice payment deadline |
 | monitoring_expires_at | timestamp | Late-payment monitoring deadline |
 | settled_at | timestamp \| null | Settlement time |
+| paid_chain | string \| null | 4.1.2+: chain slug of the proven settling method, e.g. ethereum; null without a saved qualifying settlement |
+| paid_asset | string \| null | 4.1.2+: native coin or token ticker, e.g. BTC, ETH or USDC; a display label, not unique asset identity |
+| paid_payment_method_id | UUID \| null | 4.1.2+: settling intent ID; matches payment_info.methods[].payment_method_id and its exact network/contract |
+| settlement_exchange_rate | object \| null | 4.1.2+: saved before-spread market snapshot at settlement, with explicit units, currency, source timestamps and quality flags; never repriced on delivery |
 | cancelled_at | timestamp \| null | Cancellation time |
 | exchange_rate_spread_percent | decimal string | Locked spread, not the current store default |
 | underpayment_tolerance_percent | decimal string | Locked invoice tolerance; each method also reports its effective tolerance |
@@ -79,6 +83,14 @@ The read-only endpoint is `GET /v1/projects/{project_id}/invoices/{invoice_id}/p
 `quote.effective_rate` means **asset units per one invoice currency unit**, including the saved spread. `reference_rate` is before spread. `rounding_adjustment` is the upward difference in crypto units. Provider names and source timestamps describe the original quote. Old invoices have `provenance_available: false` and null historical details.
 
 `market_rate_at_event` is an advisory cache snapshot with source times and stale/fixed/proxy flags. It excludes spread and never changes the amount owed. Unavailable data stays null. No external rate lookup delays a callback. Store-setting changes and retries never rewrite an event's quote, metadata or policy.
+
+### Quick settlement summary (merchant 4.1.2+)
+
+After a proven settlement, top-level `paid_chain` (for example `ethereum`), `paid_asset` (`USDC`) and `paid_payment_method_id` identify the method that settled the invoice. Native coins use the same fields. Use the method ID to find its exact network, contract and amounts in `payment_info.methods`; tickers are not unique and different methods are never added together.
+
+`settlement_exchange_rate` is saved when the invoice settles. It has the same fields as `market_rate_at_event`: decimal-string `rate`, explicit `units`, `currency`, `symbol`, source names/timestamps and stale/fixed/proxy flags. For EUR/USDC, `rate: "1.17"` with `units: "asset_per_invoice_currency"` means **1 EUR = 1.17 USDC**. This is an advisory market observation before spread, not the locked invoice quote or an executed trade. It never changes what the customer owes.
+
+All four summary fields are null before settlement, after invalidation, for older settlements without a saved snapshot, or for manual acceptance without qualifying policy-final funds. Missing prices alone leave the proven `paid_*` identifiers available and the rate null. A stale rate is explicitly flagged. Later payments, retries and redelivery never refresh the settlement snapshot, including a saved null. A genuine re-settlement captures a new snapshot: `observed_at` identifies that capture, while `settled_at` can retain the first settlement time. Old event bodies remain unchanged. Always check the signed invoice status and sequence; the summary is not permission to fulfil independently.
 
 ## Important receiver rules
 

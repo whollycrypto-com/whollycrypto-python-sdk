@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.1.0 - 2026-09-14
+
+- Support merchant 4.1.0 rich IPN/webhook payload version 2, including signed event identity and project/store scope. Retained legacy events remain supported.
+- Add paginated invoice payment-history reads, with exact amounts, rail/asset identifiers and invalidated observations.
+- Update receiver examples to compare invoice-state fields when deduplicating a revision, so separate events at the same sequence are accepted. Reject wrong signed project scope and conflicting state.
+- Document locked rates versus advisory market snapshots, tolerance, confirmation handling, truncation, privacy and safe fulfilment. Refresh every public API fixture and callback example.
+
 ## 2.0.0 - 2026-09-14
 
 - Target merchant 4.0.0: invoice responses use `invoice_id`, matching IPN/webhooks; `public_id` is removed by the server. Update custom response readers before upgrading the merchant.

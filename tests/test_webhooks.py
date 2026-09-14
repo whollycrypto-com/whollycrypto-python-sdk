@@ -24,14 +24,16 @@ def signed(raw):
 class WebhookTests(unittest.TestCase):
     def test_documented_callback_snapshot_all_statuses(self):
         payload = json.loads((Path(__file__).resolve().parents[1] / "examples/notification.json").read_text())
-        self.assertEqual(9, len(payload))
+        self.assertEqual(2, payload["payload_version"])
         self.assertEqual("49.9", payload["amount"])
         self.assertEqual("EUR", payload["currency"])
         for status in ("new", "processing", "settled", "expired", "invalid", "cancelled"):
             payload["status"] = status
             raw = json.dumps(payload).encode()
-            headers = {"Wholly-Signature": signed(raw), "Wholly-Event-Id": PROJECT, "Wholly-Delivery-Id": STORE}
+            headers = {"Wholly-Signature": signed(raw), "Wholly-Event-Id": payload["event_id"], "Wholly-Delivery-Id": STORE}
             self.assertEqual(status, parse_notification(raw, headers, SECRET, now=NOW).status)
+            with self.assertRaises(InvalidSignatureError):
+                parse_notification(raw, {**headers, "Wholly-Event-Id": PROJECT}, SECRET, now=NOW)
             with self.assertRaises(InvalidSignatureError):
                 parse_notification(raw, headers, "another-endpoint-secret", now=NOW)
 

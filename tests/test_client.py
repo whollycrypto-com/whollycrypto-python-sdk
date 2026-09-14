@@ -21,9 +21,9 @@ from tests.helpers import ASSET, INVOICE, PROJECT, STORE, TOKEN, FakeTransport, 
 
 
 class ClientTests(unittest.TestCase):
-    def test_all_17_public_contracts(self):
+    def test_all_18_public_contracts(self):
         catalog = json.loads((Path(__file__).parent / "fixtures/api-v1.json").read_text())
-        self.assertEqual(17, len(catalog["endpoints"]))
+        self.assertEqual(18, len(catalog["endpoints"]))
         for endpoint in catalog["endpoints"]:
             with self.subTest(endpoint=endpoint["id"]):
                 transport = FakeTransport(reply(endpoint["response"]))

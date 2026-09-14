@@ -1,5 +1,5 @@
 {
-  "merchant_version": "4.0.0",
+  "merchant_version": "4.1.0",
   "api_version": "v1",
   "endpoints": [
     {
@@ -558,7 +558,8 @@
               "status": "pending",
               "finality_mode": "confirmations",
               "required_confirmations": 1,
-              "quote_rate": "108500",
+              "quote_rate": "0.000009218",
+              "quote_details": null,
               "expected_amount": "0.00046",
               "expected_amount_atomic": "46000",
               "minimum_payment_amount": "0.0004554",
@@ -701,7 +702,8 @@
               "status": "paid",
               "finality_mode": "confirmations",
               "required_confirmations": 1,
-              "quote_rate": "108500",
+              "quote_rate": "0.000009218",
+              "quote_details": null,
               "expected_amount": "0.00046",
               "expected_amount_atomic": "46000",
               "minimum_payment_amount": "0.0004554",
@@ -728,6 +730,50 @@
         },
         "links": {
           "checkout": "{{CHECKOUT_BASE}}/invoice/0a6a98db-d93d-48ee-8c3c-fd45f90c4a50"
+        }
+      }
+    },
+    {
+      "id": "list-invoice-payments",
+      "method": "GET",
+      "path": "/v1/projects/{project_id}/invoices/{invoice_id}/payments",
+      "access": "read",
+      "body": null,
+      "response": {
+        "invoice_id": "11111111-2222-4333-8444-555555555555",
+        "data": [
+          {
+            "payment_id": "44444444-4444-4444-8444-444444444444",
+            "payment_method_id": "33333333-3333-4333-8333-333333333333",
+            "transaction_id": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "payment_hash": null,
+            "event_index": 12,
+            "payment_rail": "onchain",
+            "chain_slug": "ethereum",
+            "network": "mainnet",
+            "asset_id": "55555555-5555-4555-8555-555555555555",
+            "asset_key": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "caip_asset_id": "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "symbol": "USDC",
+            "asset_decimals": 6,
+            "amount": "58.17342",
+            "amount_atomic": "58173420",
+            "status": "final",
+            "counts_towards_received": true,
+            "confirmations": 2,
+            "block_height": 25975377,
+            "observed_at": "2026-09-14T12:03:00Z",
+            "chain_time": "2026-09-14T12:02:48Z",
+            "finalized_at": "2026-09-14T12:04:00Z",
+            "explorer_name": "Etherscan",
+            "explorer_url": "https://etherscan.io/tx/0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "pagination": {
+          "limit": 25,
+          "offset": 0,
+          "total": 1,
+          "has_more": false
         }
       }
     }

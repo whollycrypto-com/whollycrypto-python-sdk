@@ -72,7 +72,16 @@ class ReceiverTests(unittest.TestCase):
             raw = json.dumps({"invoice_id": INVOICE, "sequence": 1, "status": "new"}).encode()
             self.assertEqual(405, self.deliver(app, raw, method="GET"))
             self.assertEqual(204, self.deliver(app, raw))
-            self.assertEqual(409, self.deliver(app, raw + b" "))  # Valid HMAC, conflicting exact signed body.
+            self.assertEqual(204, self.deliver(app, raw + b" "))  # Whitespace does not change invoice state.
+            base = json.loads(raw)
+            for event_type, event_id in (("payment.received", ASSET), ("invoice.processing", STORE)):
+                rich = json.dumps({**base, "payload_version": 2, "project_id": PROJECT, "store_id": STORE,
+                                   "event_id": event_id, "event_type": event_type}).encode()
+                self.assertEqual(204, self.deliver(app, rich, event=event_id))
+            wrong_scope = json.dumps({**base, "payload_version": 2, "project_id": ASSET, "store_id": STORE,
+                                      "event_id": PROJECT, "event_type": "invoice.created"}).encode()
+            self.assertEqual(400, self.deliver(app, wrong_scope))
+            self.assertEqual(409, self.deliver(app, json.dumps({**base, "status": "invalid"}).encode()))
             failed = receiver.create_app(SECRET, Path(folder) / "missing" / "inbox.sqlite", PROJECT)
             self.assertEqual(503, self.deliver(failed, raw))
             os.chmod(path, 0o644)

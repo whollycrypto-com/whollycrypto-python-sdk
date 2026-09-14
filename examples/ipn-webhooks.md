@@ -1,80 +1,96 @@
-# Receive IPN and webhooks
+# IPN & webhooks
 
-Use [webhook_wsgi.py](webhook_wsgi.py) for either channel. Both send the same JSON; configure each receiver with the correct secret.
+Use [webhook_wsgi.py](webhook_wsgi.py) as a receiver and [notification.json](notification.json) as a synthetic version-2 example. These examples send no payments and contain no real credentials.
 
-## Set up the two channels
+[Setup guide](https://www.whollycrypto.com/documentation/#delivery-history) · [Full field reference](https://www.whollycrypto.com/api/#notifications) · Your console: `/settings/api/docs/#notifications`.
 
-| Channel | Where you configure it | What arrives | Secret |
-| --- | --- | --- | --- |
-| IPN | Store → IPN, plus the store default URL or `ipn_url` on invoice creation | Every generated invoice event | Store IPN signing secret |
-| Webhook | Store → Webhooks → endpoint URL and selected events | Only your selected events | That endpoint's own signing secret |
+## Choose the receiver
 
-Use separate trusted routes or application instances (for example `/callbacks/wholly-ipn` and `/callbacks/wholly-webhook`) with their respective secrets. Do not choose a secret from unverified request data. Neither secret is your merchant API token. Rotating the IPN secret does not rotate webhook secrets. Enabling both can deliver the same invoice revision twice.
+IPN sends every generated invoice event to the invoice's `ipn_url`, or the store default when inherited. It uses the **Store → IPN signing secret**. Webhooks send selected events and each endpoint has **its own signing secret**. Neither uses your API token. Choose the secret from trusted configuration, never unverified request data.
 
-Mount `create_app(signing_secret, private_sqlite_path, configured_project_id)` behind your HTTPS WSGI server. Python 3.10+; only the SDK and standard library are needed. The module does not start a server. Create a private 0700 queue directory outside the web root, owned by the application user. See the main README for pip-free imports.
+| Event | Invoice status | Meaning |
+| --- | --- | --- |
+| invoice.created | new | Invoice created and awaiting payment. Also used when a controlled reopen returns an invoice to new. |
+| payment.received | Resulting invoice status | A payment was recorded or the received amount increased. Usually processing or settled; this event alone is not proof of settlement. |
+| invoice.processing | processing | Payment detected, but the accepted amount or required finality is not yet met. Partial payments are included. |
+| invoice.settled | settled | Settlement policy met, or accepted manually. Check resolution and your order before fulfilment. |
+| invoice.expired | expired | Payment deadline passed. A late payment can still change the status while monitoring continues. |
+| invoice.invalid | invalid | Cannot be accepted automatically, payment evidence was lost, or a merchant rejected it. Review the invoice. |
+| invoice.cancelled | cancelled | Invoice cancelled. Do not fulfil; a cancellation does not refund an on-chain payment. |
 
-## What the POST contains
+An amount can be paid while the invoice is still processing. Fulfil only after verified `settled` status and your order checks. Reorgs and late, partial or excess payments may need review. Confirmation changes do not guarantee an event on every block.
 
-[notification.json](notification.json) is a complete synthetic callback body, for a €49.90 invoice settled under the store's rules:
+## Version 2 payload
 
-```json
-{
-  "invoice_id": "11111111-2222-4333-8444-555555555555",
-  "status": "settled",
-  "amount_status": "paid",
-  "timing_status": "on_time",
-  "resolution": "automatic",
-  "sequence": 3,
-  "amount": "49.9",
-  "currency": "EUR",
-  "order_id": "order-1042"
-}
-```
+Merchant 4.1.0 adds signed event identity, actual chain/token transfers, exact amounts, quote provenance, metadata and customer fields. The original nine invoice fields remain. Already queued legacy events have no `payload_version` and keep their original body.
 
-The nine fields above are the entire body, not an envelope. `invoice_id` is the **public** invoice UUID. `amount` is the original invoice total, **not the crypto received**. It remains EUR even when the customer pays USDC. Keep decimal amounts as strings.
+| Field | Type | Meaning |
+| --- | --- | --- |
+| invoice_id | UUID | Public invoice UUID, used by the authenticated invoice detail route |
+| status | string | Snapshot invoice state: new, processing, settled, expired, invalid, cancelled |
+| amount_status | string | none, partial, paid, or overpaid; paid includes the accepted underpayment tolerance, not confirmation finality |
+| timing_status | string | on_time or late |
+| resolution | string | automatic, manually_settled, or manually_invalidated |
+| sequence | integer | Increasing invoice revision; different events can share one revision. Compare without losing integer precision |
+| amount | decimal string | Original invoice total, not the received crypto amount; preserve decimal precision |
+| currency | string | Currency of amount, e.g. EUR for a EUR invoice paid with USDC |
+| order_id | string \| null | Merchant order reference |
+| payload_version | integer | 2 for newly generated 4.1.0+ events; absent on retained legacy events |
+| event_id | UUID | Signed event identity, unchanged on retries and manual redelivery |
+| event_type | string | One of the seven subscription events |
+| occurred_at | timestamp | When this immutable event was created, not delivery time |
+| project_id | UUID | Merchant project scope; match to configured receiver |
+| store_id | UUID | Merchant store scope; match to configured receiver |
+| description | string \| null | Original invoice description |
+| email | string \| null | Optional customer email at event creation |
+| customer | object | Recognized optional customer metadata fields; no guessed or enriched personal data |
+| metadata | object | Original merchant metadata as it existed at event creation |
+| created_at | timestamp | Invoice creation time |
+| updated_at | timestamp | Invoice state update time |
+| expires_at | timestamp | Invoice payment deadline |
+| monitoring_expires_at | timestamp | Late-payment monitoring deadline |
+| settled_at | timestamp \| null | Settlement time |
+| cancelled_at | timestamp \| null | Cancellation time |
+| exchange_rate_spread_percent | decimal string | Locked spread, not the current store default |
+| underpayment_tolerance_percent | decimal string | Locked invoice tolerance; each method also reports its effective tolerance |
+| reason_code | string \| null | Machine-readable state-transition reason |
+| requires_review | boolean | Payment exception hint; not permission to fulfil or refund automatically |
+| links | object | checkout, authenticated invoice and payments URLs at event creation; null if no active host record |
+| payment_info | object | Actual observed methods, exact amounts, locked quote, advisory market snapshot and bounded payment observations; see field groups below |
 
-| Invoice `status` | Meaning |
-| --- | --- |
-| `new` | Awaiting payment |
-| `processing` | Payment detected; amount or finality still missing |
-| `settled` | Accepted under invoice rules, or manually |
-| `expired` | Deadline passed; late monitoring can continue |
-| `invalid` | Payment cannot be accepted automatically, evidence lost, or rejected |
-| `cancelled` | Cancelled; this does not refund a payment |
+### Amounts and payment history
 
-`amount_status`: `none`, `partial` (underpaid), `paid` (including allowed tolerance), or `overpaid`. `timing_status`: `on_time` or `late`. `resolution`: `automatic`, `manually_settled` or `manually_invalidated`.
+`payment_info.methods` contains only observed methods, not every checkout choice. Before a payment, it is empty and `active_payment_method_id` is null. Identify an asset by network plus asset/contract ID, never by ticker alone. Never add BTC, USDC or different network balances together.
 
-Subscription events are `invoice.created`, `payment.received`, `invoice.processing`, `invoice.settled`, `invoice.expired`, `invoice.invalid` and `invoice.cancelled`. **Event names are not transmitted in the body or headers.** Inspect the status fields. A payment event and status event can share the same body/sequence. There is no `invoice.paid` event. Not all states occur; zero-confirmation payments may settle immediately and permitted zero-amount invoices settle without payment.
+Each method includes `amounts`: expected, received, confirmed, unconfirmed, minimum accepted, remaining, remaining-to-full and overpaid amounts. Every amount has an exact `*_atomic` integer-string companion. Preserve strings; use integer/decimal arithmetic, not floats. Lightning BTC uses 11 decimals (millisatoshis); on-chain BTC uses 8.
 
-Callbacks do not include transaction hashes, chain/token, crypto amounts, confirmations, customer details, metadata, project/store IDs or checkout URLs. Fetch the authenticated invoice for those fields:
+`remaining_amount` is the accepted minimum minus **received** funds, floored at zero. It is not an instruction to resend unconfirmed funds. `remaining_to_full_amount` ignores tolerance. `unconfirmed_amount` is received minus confirmed. The locked acceptance policy, not a guessed confirmation count, determines settlement. Lightning's effective tolerance is zero.
+
+Histories are bounded: at most eight observed methods and five recent transfers each, or fewer to fit the 64 KiB event limit. Check `method_count`, `methods_truncated`, `payment_count` and `payments_truncated`. For complete **current** history use:
 
 ```python
-# After parse_notification() has verified the raw bytes:
-status = notice.status
-amount_state = notice.payload["amount_status"]
-invoice_total = notice.payload["amount"]  # "49.9", not USDC received
-# In your durable worker, using the project's configured API host and token:
-detail = client.get_invoice(configured_project_id, notice.invoice_id)
-invoice = detail["data"]
-# Match your stored order, project/store, amount and currency before fulfilment.
-# Only invoice["status"] == "settled" is eligible; commit order updates once.
+client.list_invoice_payments(project_id, invoice_id, {"limit": 25, "offset": 0})
 ```
 
-This snippet is for your worker, not the HTTP acknowledgement path. It does not implement order matching or fulfilment; those depend on your shop's database and business rules. The receiving examples only verify and queue.
+The read-only endpoint is `GET /v1/projects/{project_id}/invoices/{invoice_id}/payments`. Filter by `payment_method_id`; paginate with `limit` and `offset`. Deduplicate live pages by `payment_id`. One transaction can contain several token logs or UTXO outputs. Reorged, replaced and invalid records remain visible with `counts_towards_received: false`. Lightning uses `payment_hash`, not a transaction/explorer URL.
 
-## Verify, queue, acknowledge
+### Locked quote versus market rate
 
-1. Verify `Wholly-Signature` against the **exact raw body** before JSON parsing. HMAC-SHA256 signs `timestamp + "." + raw_body`; header format: `t=<unix-seconds>,v1=<hex>`. The SDK rejects invalid signatures and timestamps outside five minutes by default. Keep clocks synchronized.
-2. Commit to a durable inbox before returning HTTP 2xx. Failed storage must return a failure so delivery can retry. The sender times out after 10 seconds and does not follow redirects.
-3. Deduplicate the signed `invoice_id` and `sequence`, scoped to the **configured project**. Keep `Wholly-Event-Id` and `Wholly-Delivery-Id` for diagnostics; these headers are **not signed** and must not be your sole replay key. A conflicting signed body for the same revision needs review.
-4. Fetch the authenticated invoice, validate its order/project/store/amount/currency against your records, and fulfil only on `settled`. Process each order transactionally once. Never let an older sequence overwrite a newer one; status can change through reconciliation, so do not assign statuses a permanent rank.
+`quote.effective_rate` means **asset units per one invoice currency unit**, including the saved spread. `reference_rate` is before spread. `rounding_adjustment` is the upward difference in crypto units. Provider names and source timestamps describe the original quote. Old invoices have `provenance_available: false` and null historical details.
 
-IPN retries retryable failures up to eight attempts: immediately, then delays of 10 seconds, 1 minute, 5 minutes, 15 minutes, 1 hour, 6 hours and 24 hours **after the previous attempt finishes**. Webhook automatic retries can be disabled. Delayed, duplicate and out-of-order messages are normal. Retry signatures use a new timestamp; manual redelivery keeps the event ID but creates a new delivery ID. Payload retention is 90 days. Low processing credits pause deliveries, not incoming payments.
+`market_rate_at_event` is an advisory cache snapshot with source times and stale/fixed/proxy flags. It excludes spread and never changes the amount owed. Unavailable data stays null. No external rate lookup delays a callback. Store-setting changes and retries never rewrite an event's quote, metadata or policy.
 
-In merchant 4.0.0+, creation/detail returns `data.invoice_id` and invoice list rows use `invoice_id`, matching this callback ID. The old `public_id` field is removed. Use the same value to fetch the invoice; never use internal `id` or `order_id` in the invoice URL.
+## Important receiver rules
 
-Open **Invoice → Details → IPN History / Webhook History** for that invoice's collapsed delivery lists. **Store → IPN / Webhooks → History** searches across invoices by order, invoice ID, email or name. **Details** opens a modal with the saved body/status, target and delivery result. Current customer metadata is shown separately; it is not part of the callback. Expired payloads are never recreated.
+1. Verify the exact raw body bytes, timestamp and HMAC before parsing or storing. Use a 300-second clock tolerance and reject invalid signatures. Proxy/body-parser rewrites break verification.
+2. Event/delivery headers are **not signed**. Version 2 has a signed `event_id`, `event_type`, `project_id` and `store_id` in the body; the SDK rejects an event-header/body mismatch. Match project/store to your configured receiver. For legacy events, use configured scope plus signed invoice ID/sequence, not a header-only identity.
+3. Commit to a private durable inbox before returning 2xx. On storage failure return an error so Wholly Crypto retries. Do not fulfil an order in the HTTP handler.
+4. The supplied order-state inbox deduplicates by configured project + `invoice_id` + `sequence`. Different event types may share that revision. Compare the original nine invoice-state fields, **not the whole JSON body**; event IDs, rates and formatting can differ. Retain the original raw body privately. A changed status/amount at the same revision requires review. If you need every event, deduplicate on the signed v2 event ID instead and still guard fulfilment separately.
+5. Re-fetch the invoice from your **configured API origin**, match project, store, order, amount and currency, then fulfil once in a database transaction. Never send a bearer token to an arbitrary URL in a callback. Ignore stale revisions; a checkout redirect is not proof of payment. Reconcile reversals explicitly, not by fulfilling again.
+6. Metadata and customer fields are private merchant data. Do not put secrets in metadata or log whole bodies publicly. Callbacks never add wallet keys, recovery words, provider credentials or Lightning preimages. Explorer links are public; protect your own retained customer data.
 
-[Integration guide](https://www.whollycrypto.com/documentation/#delivery-history) · [Full callback contract and payload](https://www.whollycrypto.com/api/#notifications) · [Invoice detail API](https://www.whollycrypto.com/api/#get-invoice)
+Delivery is at-least-once, can be delayed/out of order, and keeps the original snapshot on retries and manual redelivery. Signatures use a fresh delivery timestamp. Saved payloads expire after 90 days; an expired body cannot be reconstructed or resent. Low processing credits pause notifications, not customer payments. Review failed deliveries in the console's store or invoice history.
 
-Your installation also has **Settings → API access → API documentation → Dynamic IPN & webhooks** (`/settings/api/docs/#notifications`). The public docs describe the latest merchant version; check your installed reference when running an older version.
+## Upgrade note
+
+Update receivers that require exactly nine fields or compare whole bodies for duplicate invoice revisions. SDK 2.1.0 accepts retained legacy events and the new version-2 payload. The optional fields do not change your invoice total or fulfilment rules.

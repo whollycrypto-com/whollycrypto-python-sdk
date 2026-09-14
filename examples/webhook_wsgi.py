@@ -13,12 +13,19 @@ least your application's entire delivery/redelivery window.
 from __future__ import annotations
 
 import os
+import json
 import re
 import sqlite3
 import stat
 from pathlib import Path
 
 from whollycrypto import InvalidSignatureError, parse_notification
+
+
+def invoice_state(payload):
+    """Compare invoice revision fields, not event IDs, market snapshots or JSON formatting."""
+    fields = ("invoice_id", "status", "amount_status", "timing_status", "resolution", "sequence", "amount", "currency", "order_id")
+    return tuple(str(payload.get(key, "")) if key == "sequence" else payload.get(key) for key in fields)
 
 
 def create_app(signing_secret: str, queue_path: str | Path, project_id: str):
@@ -56,6 +63,9 @@ def create_app(signing_secret: str, queue_path: str | Path, project_id: str):
                 signing_secret,
             )
         except InvalidSignatureError:
+            return respond("400 Bad Request")
+
+        if notice.payload.get("project_id", project_id).lower() != project_id.lower():
             return respond("400 Bad Request")
 
         connection = None
@@ -105,11 +115,11 @@ def create_app(signing_secret: str, queue_path: str | Path, project_id: str):
                     "SELECT payload FROM wholly_inbox WHERE project_id=? AND invoice_id=? AND sequence=?",
                     (project_id.lower(), notice.invoice_id.lower(), notice.sequence),
                 ).fetchone()
-                if existing is None or existing[0] != raw:
+                if existing is None or invoice_state(json.loads(existing[0])) != invoice_state(notice.payload):
                     # A conflicting signed snapshot needs review, not a silent acknowledgement.
                     return respond("409 Conflict")
             return respond("204 No Content")  # Only after the transaction is durable.
-        except (OSError, sqlite3.Error):
+        except (OSError, sqlite3.Error, ValueError, TypeError):
             # Never acknowledge failed storage or print customer payloads/secrets.
             return respond("503 Service Unavailable")
         finally:

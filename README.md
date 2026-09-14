@@ -6,7 +6,7 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.0.0** targets API **v1**, tested against merchant **4.0.0**.
+SDK **2.1.0** targets API **v1**, tested against merchant **4.1.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -21,7 +21,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.0.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.0.0.zip).
+1. [Download SDK 2.1.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.1.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:
@@ -252,11 +252,14 @@ validates UUIDs, status and sequence, then returns a readonly `Notification` pay
 `notice.invoice_id` is the **public** invoice UUID.
 
 Signatures cover the timestamp and raw body, **not** event/delivery ID headers.
-Do not deduplicate using event ID alone: changing it must not let an attacker
-bypass replay protection, and a forged collision must not suppress a different
-signed invoice. Use the signed invoice ID and sequence, scoped to your configured
-project. Keep invoice state monotonic and re-check the authenticated invoice.
-Event names are not sent in the payload or headers.
+Version 2 signs `event_id`, `event_type`, `project_id` and `store_id` in the body.
+Legacy events keep their old format. Match configured scope and re-check the
+authenticated invoice before fulfilling. Different event types can share one
+revision: compare the original nine invoice-state fields, not the whole body.
+`payment_info` includes chain/token amounts, remaining funds, confirmations,
+locked quote/spread/tolerance, advisory rates and bounded transfer history.
+Use `client.list_invoice_payments(project_id, invoice_id, {"limit": 25, "offset": 0})`
+for complete current observations. Keep metadata and customer data private.
 
 The [WSGI inbox example](https://github.com/whollycrypto-com/whollycrypto-python-sdk/blob/main/examples/webhook_wsgi.py)
 verifies before storage, queues durably in private SQLite, handles duplicates and
@@ -340,7 +343,7 @@ python -m build
 python -m twine check dist/*
 ```
 
-Tests cover all 17 merchant endpoints, validation, precision, retry identity, HTTP
+Tests cover all 18 merchant endpoints, validation, precision, retry identity, HTTP
 connection reuse, TLS rejection, signature verification and the durable receiver.
 They use only mocks/disposable loopback servers and SQLite, never live payments.
 Tests require OpenSSL CLI, SSL and SQLite support. Plain HTTP is available only for

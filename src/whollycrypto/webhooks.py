@@ -124,6 +124,19 @@ def parse_notification(
         ):
             raise ValueError
         uuid_path(payload.get("invoice_id"))
+        if "payload_version" in payload:
+            if (
+                type(payload["payload_version"]) is not int or payload["payload_version"] != 2
+                or uuid_path(payload.get("event_id")) != event_id
+                or payload.get("event_type") not in (
+                    "invoice.created", "payment.received", "invoice.processing", "invoice.settled",
+                    "invoice.expired", "invoice.invalid", "invoice.cancelled",
+                )
+            ):
+                raise ValueError
+            uuid_path(payload.get("project_id"))
+            uuid_path(payload.get("store_id"))
+            event_id = uuid_path(payload["event_id"])  # Authenticated body identity.
         return Notification(event_id, delivery_id, _freeze(payload))
     except (ValueError, UnicodeError, RecursionError):
         raise InvalidSignatureError("Signed notification has invalid identifiers or payload.") from None

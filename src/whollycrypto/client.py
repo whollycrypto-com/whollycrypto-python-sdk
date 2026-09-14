@@ -84,6 +84,14 @@ class Client:
             "GET", self._project(project_id) + "/invoices/" + uuid_path(public_invoice_id)
         )
 
+    def list_invoice_payments(
+        self, project_id: str | UUID, invoice_id: str | UUID, filters: Mapping[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Current observations; filters: payment_method_id, limit (1–100), offset (0–1,000,000)."""
+        return self._http.request(
+            "GET", self._project(project_id) + "/invoices/" + uuid_path(invoice_id) + "/payments", filters
+        )
+
     def list_invoices(
         self, project_id: str | UUID, filters: Mapping[str, Any] | None = None
     ) -> dict[str, Any]:

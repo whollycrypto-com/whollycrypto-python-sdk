@@ -65,5 +65,6 @@ def invoke(client, endpoint, body):
             PROJECT, {"search": "order-1042", "limit": 50, "offset": 0}
         ),
         "get-invoice": lambda: client.get_invoice(PROJECT, INVOICE),
+        "list-invoice-payments": lambda: client.list_invoice_payments(PROJECT, INVOICE, {"limit": 25, "offset": 0}),
     }
     return calls[endpoint]()

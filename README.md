@@ -4,16 +4,60 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **1.0.0** targets API **v1**, tested against merchant **3.5.0**.
+SDK **1.0.1** targets API **v1**, tested against merchant **3.5.0**.
 SDK and merchant versions are independent.
 
 ## Install
+
+### With pip
 
 ```bash
 python -m pip install whollycrypto
 ```
 
 Use a virtual environment for your application. Import the package as `whollycrypto`.
+
+### Without pip (manual download)
+
+1. [Download SDK 1.0.1 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v1.0.1.zip).
+2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
+   application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
+3. Import it normally. No pip, build tools or third-party packages are needed:
+
+```python
+import os
+import whollycrypto
+
+with whollycrypto.Client(
+    "https://api.your-domain.com",
+    os.environ["WHOLLY_API_TOKEN"],
+) as client:
+    # Use the invoice/payment methods below here.
+    pass
+```
+
+Your layout should be `your-app/app.py` and `your-app/whollycrypto/__init__.py`
+(plus the other files inside `whollycrypto/`). Do not name your script `whollycrypto.py`;
+it would hide the SDK package. Python 3.10+ with SSL support is still required.
+Set `WHOLLY_API_TOKEN` on your server using a credential from **Settings → API access**.
+`import whollycrypto` / `whollycrypto.Client(...)` and `from whollycrypto import Client`
+both work, with the same API and signature helpers as a pip installation.
+
+**Keep the downloaded SDK folder intact instead?** Rename it to
+`whollycrypto-python-sdk`, place it beside your script and load its `src/` directory:
+
+```python
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "whollycrypto-python-sdk" / "src"))
+import whollycrypto
+```
+
+Use only a trusted, fixed local path, never one from a customer's request. This
+also lets you run a downloaded example with a local `PYTHONPATH` pointing to that
+`src/` directory. For manual updates, replace the SDK folder with a newer tagged
+download; keep your application code and credentials outside it.
 
 ## Create an invoice
 

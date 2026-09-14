@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2026-09-14
+
+- Document manual ZIP installation without pip, build tools or third-party packages.
+- Add examples for a copied local package and an intact SDK folder, including direct `whollycrypto.Client(...)` usage.
+- Test manual loading in fresh Python processes without site-packages or package metadata, including invoice precision and webhook verification.
+- No API, request encoding, invoice idempotency or callback-signature changes. Still targets merchant API v1, tested against merchant 3.5.0.
+
 ## 1.0.0 - 2026-09-13
 
 - Initial Python 3.10+ SDK for all 17 merchant API v1 endpoints, tested against merchant 3.5.0.

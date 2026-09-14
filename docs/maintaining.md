@@ -13,6 +13,9 @@ When a public API route, request, response, permission or behavior changes:
 5. Update `_version.py` and changelog, build wheel/sdist and test both in clean environments.
 6. Publish an immutable Git tag and GitHub release, then upload the audited artifacts
    to PyPI. Verify hashes/metadata and a clean install from the default PyPI index.
+   Update the README's manual ZIP link. Test the downloaded `src/whollycrypto`
+   package without pip or site-packages, both copied beside an application and
+   loaded from the intact source layout. Runtime imports must not need distribution metadata.
 
 ```bash
 node tools/check-api-coverage.mjs /path/to/api-docs.js /path/to/api-examples.js

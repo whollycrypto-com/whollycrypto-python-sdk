@@ -81,7 +81,7 @@ with Client("https://api.your-domain.com", os.environ["WHOLLY_API_TOKEN"]) as cl
         "11111111-1111-4111-8111-111111111111",  # Your Project API ID
         "22222222-2222-4222-8222-222222222222",  # Your Store API ID
         {
-            "amount": "49.90",  # A string, never a float
+            "amount": "49.90",  # From a variable: "amount": str(amount)
             "currency": "EUR",
             "order_id": "order-1042",
             "email": "customer@example.com",
@@ -206,10 +206,28 @@ IDs accept strings or `uuid.UUID`. See the
 Refunds, sends, reconciliation decisions, accounts, exchange credentials and Lightning
 configuration are console-only; the SDK does not invent public routes for them.
 
+Keep amounts as decimal strings from the start. `str(amount)` converts a variable to the required string type, but cannot recover precision already lost through floating-point calculations. Keep the original decimal text or use `Decimal`; do not calculate payment totals with floats.
+
 ## Verify IPN and webhooks
 
-Both use the same signature format. Use the **IPN/webhook signing secret** from
-the store configuration, not an API token. Pass the exact raw body as `bytes`.
+IPN sends every generated invoice event to the store default URL or invoice's
+`ipn_url`. Webhooks send only selected events. Both deliver the same JSON snapshot.
+Use **Store → IPN's secret for IPN** and **the individual webhook endpoint's secret
+for webhooks**, never an API token. Rotating one does not rotate the others.
+Pass the exact raw body as `bytes`.
+
+**Fulfil on `status = settled`, not `processing` or `amount_status = paid`.**
+Invoice statuses are `new`, `processing`, `settled`, `expired`, `invalid`, `cancelled`.
+Underpaid/overpaid use `amount_status`; lateness uses `timing_status`.
+The body contains `invoice_id` (public UUID), `status`, `amount_status`,
+`timing_status`, `resolution`, `sequence`, `amount`, `currency`, `order_id`.
+`amount` is the invoice total, not crypto received. Event names, transaction hashes,
+chain/token, customer data and metadata are not sent; fetch the full invoice via API.
+
+[IPN/webhook setup and receiver example](examples/ipn-webhooks.md) ·
+[Integration guide](https://www.whollycrypto.com/documentation/#delivery-history) ·
+[Event table and full payload](https://www.whollycrypto.com/api/#notifications).
+Also available in your console at `/settings/api/docs/#notifications`.
 
 ```python
 from whollycrypto import InvalidSignatureError, parse_notification

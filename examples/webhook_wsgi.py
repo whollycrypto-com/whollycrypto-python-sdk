@@ -1,6 +1,8 @@
 """Durable IPN/webhook inbox example (WSGI, standard library).
 
 Mount create_app() behind your HTTPS application server; this file starts no server.
+Works for IPN or webhooks; see ipn-webhooks.md and notification.json beside this file.
+IPN uses the Store -> IPN secret; a webhook uses its own endpoint secret, not an API token.
 Use one configured project and signing secret per endpoint. Create a private 0700
 directory outside your web root for the database. It is not a fulfilment worker:
 your worker must re-fetch the invoice, match the stored order/project/store/amount

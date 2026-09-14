@@ -1,6 +1,8 @@
 """Opt-in example: running this creates a real invoice on YOUR configured merchant API.
 
 Persist the order payload and idempotency key before running. Never print the token.
+Variable example: amount = "25.00", then "amount": str(amount).
+Keep decimal input as a string or Decimal; str(float) cannot recover lost precision.
 """
 
 import os

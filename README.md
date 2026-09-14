@@ -1,10 +1,12 @@
 # Wholly Crypto Python SDK
 
+**Merchant 4 upgrade:** read `data.invoice_id` from invoice creation/detail and `invoice_id` from list rows. It matches the callback `invoice_id`. The server no longer returns `public_id`; internal `id` is not a checkout ID. Update custom response readers before upgrading your merchant. For older merchants, keep SDK 1.x or explicitly handle their older response shape.
+
 The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **1.0.1** targets API **v1**, tested against merchant **3.5.0**.
+SDK **2.0.0** targets API **v1**, tested against merchant **4.0.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -19,7 +21,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 1.0.1 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v1.0.1.zip).
+1. [Download SDK 2.0.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.0.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:
@@ -93,7 +95,7 @@ with Client("https://api.your-domain.com", os.environ["WHOLLY_API_TOKEN"]) as cl
         idempotency_key=idempotency_key,
     )
 
-public_invoice_id = result["data"]["public_id"]
+public_invoice_id = result["data"]["invoice_id"]
 checkout_url = result["links"]["checkout"]
 ```
 
@@ -130,7 +132,7 @@ for invoice in client.iter_invoices(project_id, {"status": "settled"}):
     pass
 ```
 
-These snippets use an open `client`. Invoice paths use `public_id`, **not** internal
+These snippets use an open `client`. Invoice paths use `invoice_id`, **not** internal
 `id` or `order_id`. `processing` is not `settled`. Pages are separate snapshots, so
 deduplicate by public invoice ID if exporting while new invoices are arriving.
 
@@ -182,7 +184,7 @@ the server binds idempotency to the original credential and **exact raw JSON byt
 | --- | --- |
 | `service_info()` / `health()` | Public service/health; no token sent |
 | `create_invoice(project, store, payload, idempotency_key)` | Create or safely replay an invoice |
-| `get_invoice(project, public_id)` | Private invoice detail and current checkout link |
+| `get_invoice(project, invoice_id)` | Private invoice detail and current checkout link |
 | `list_invoices(project, filters)` / `iter_invoices(project, filters)` | Search and paginate invoices |
 | `list_project_payment_assets(project)` | Native/token policies and readiness |
 | `update_project_payment_asset(project, asset, policy)` | Update a project asset policy |
@@ -195,7 +197,7 @@ the server binds idempotency to the original credential and **exact raw JSON byt
 | `update_store_confirmation_policy(project, store, asset, policy)` | Inherit or override confirmations |
 | `list_project_wallets(project)` | Public addresses and balances; no keys |
 | `list_reconciliation(project, filters)` | Needs-attention queue, fixed 25 cases per page |
-| `get_reconciliation(project, public_id, page=1)` | Detail and paginated decision history |
+| `get_reconciliation(project, invoice_id, page=1)` | Detail and paginated decision history |
 
 IDs accept strings or `uuid.UUID`. See the
 [full API reference](https://www.whollycrypto.com/api/) and

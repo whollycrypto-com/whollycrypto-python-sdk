@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 2.0.0 - 2026-09-14
+
+- Target merchant 4.0.0: invoice responses use `invoice_id`, matching IPN/webhooks; `public_id` is removed by the server. Update custom response readers before upgrading the merchant.
+- Refresh all request/response fixtures, create/list examples and history documentation. Python 3.10+ support and callback verification are unchanged.
 
 - Explain IPN versus webhook selection and secrets, all invoice statuses and the complete callback body.
 - Add callback setup/worker guidance and a verified JSON sample in examples, with links to the live documentation.

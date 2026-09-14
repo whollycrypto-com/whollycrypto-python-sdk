@@ -34,7 +34,7 @@ class ClientTests(unittest.TestCase):
                 request = transport.requests[0]
                 self.assertEqual(endpoint["method"], request.method)
                 path = endpoint["path"].format(
-                    project_id=PROJECT, store_id=STORE, public_id=INVOICE, asset_id=ASSET
+                    project_id=PROJECT, store_id=STORE, invoice_id=INVOICE, asset_id=ASSET
                 )
                 self.assertEqual(path, urlsplit(request.url).path)
                 self.assertEqual(
@@ -169,16 +169,16 @@ class ClientTests(unittest.TestCase):
     def test_pagination_lazy_and_bounded(self):
         fake = FakeTransport(
             reply(
-                {"data": [{"public_id": INVOICE}], "pagination": {"offset": 0, "limit": 1, "has_more": True}}
+                {"data": [{"invoice_id": INVOICE}], "pagination": {"offset": 0, "limit": 1, "has_more": True}}
             ),
             reply(
-                {"data": [{"public_id": ASSET}], "pagination": {"offset": 1, "limit": 1, "has_more": False}}
+                {"data": [{"invoice_id": ASSET}], "pagination": {"offset": 1, "limit": 1, "has_more": False}}
             ),
         )
         client = Client("https://api.example.test", TOKEN, transport=fake)
         iterator = client.iter_invoices(PROJECT, {"limit": 1, "status": "settled"})
         self.assertEqual(0, len(fake.requests))
-        self.assertEqual([INVOICE, ASSET], [row["public_id"] for row in iterator])
+        self.assertEqual([INVOICE, ASSET], [row["invoice_id"] for row in iterator])
         self.assertEqual(["1"], parse_qs(urlsplit(fake.requests[1].url).query)["offset"])
         for pagination in (
             {"offset": 0, "limit": 50, "has_more": True},

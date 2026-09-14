@@ -71,7 +71,9 @@ This snippet is for your worker, not the HTTP acknowledgement path. It does not 
 
 IPN retries retryable failures up to eight attempts: immediately, then delays of 10 seconds, 1 minute, 5 minutes, 15 minutes, 1 hour, 6 hours and 24 hours **after the previous attempt finishes**. Webhook automatic retries can be disabled. Delayed, duplicate and out-of-order messages are normal. Retry signatures use a new timestamp; manual redelivery keeps the event ID but creates a new delivery ID. Payload retention is 90 days. Low processing credits pause deliveries, not incoming payments.
 
-In merchant 3.5.2+, open **Store → IPN / Webhooks → History → Details** for the saved status/body, target and delivery result. This is a snapshot, not current invoice status; expired payloads are not recreated.
+In merchant 4.0.0+, creation/detail returns `data.invoice_id` and invoice list rows use `invoice_id`, matching this callback ID. The old `public_id` field is removed. Use the same value to fetch the invoice; never use internal `id` or `order_id` in the invoice URL.
+
+Open **Invoice → Details → IPN History / Webhook History** for that invoice's collapsed delivery lists. **Store → IPN / Webhooks → History** searches across invoices by order, invoice ID, email or name. **Details** opens a modal with the saved body/status, target and delivery result. Current customer metadata is shown separately; it is not part of the callback. Expired payloads are never recreated.
 
 [Integration guide](https://www.whollycrypto.com/documentation/#delivery-history) · [Full callback contract and payload](https://www.whollycrypto.com/api/#notifications) · [Invoice detail API](https://www.whollycrypto.com/api/#get-invoice)
 

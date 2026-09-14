@@ -13,7 +13,7 @@ import whollycrypto
 from whollycrypto import Client
 
 assert Client is whollycrypto.Client
-assert whollycrypto.__version__ == "1.0.1"
+assert whollycrypto.__version__ == "2.0.0"
 assert Path(whollycrypto.__file__).resolve().is_relative_to(Path(__file__).resolve().parent)
 assert not any("site-packages" in path or "dist-packages" in path for path in sys.path)
 project = "11111111-1111-4111-8111-111111111111"
@@ -31,7 +31,7 @@ class FixtureTransport:
         return whollycrypto.Response(
             200,
             {"Content-Type": "application/json"},
-            json.dumps({"data": {"public_id": invoice, "amount": amount}}).encode(),
+            json.dumps({"data": {"invoice_id": invoice, "amount": amount}}).encode(),
         )
 
 
@@ -39,7 +39,7 @@ with whollycrypto.Client("https://api.example.test", token, transport=FixtureTra
     result = client.create_invoice(
         project, store, {"currency": "EUR", "amount": amount}, "saved-manual-fixture-key"
     )
-    assert result["data"]["public_id"] == invoice
+    assert result["data"]["invoice_id"] == invoice
     assert result["data"]["amount"] == amount
 
 raw = json.dumps({"invoice_id": invoice, "sequence": 1, "status": "settled"}).encode()

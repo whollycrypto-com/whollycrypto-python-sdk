@@ -29,17 +29,21 @@ class WebhookTests(unittest.TestCase):
         self.assertEqual("EUR", payload["currency"])
         self.assertEqual("ethereum", payload["paid_chain"])
         self.assertEqual("USDC", payload["paid_asset"])
+        self.assertEqual("58.17342", payload["paid_asset_amount"])
+        self.assertEqual("58.17342", payload["paid_asset_amount_received"])
         self.assertEqual("1.17", payload["settlement_exchange_rate"]["rate"])
         for status in ("new", "processing", "settled", "expired", "invalid", "cancelled"):
             case = {**payload, "status": status}
             if status != "settled":
-                for key in ("paid_chain", "paid_asset", "paid_payment_method_id", "settlement_exchange_rate"):
+                for key in ("paid_chain", "paid_asset", "paid_asset_amount", "paid_asset_amount_received", "paid_payment_method_id", "settlement_exchange_rate"):
                     case[key] = None
             raw = json.dumps(case).encode()
             headers = {"Wholly-Signature": signed(raw), "Wholly-Event-Id": payload["event_id"], "Wholly-Delivery-Id": STORE}
             parsed = parse_notification(raw, headers, SECRET, now=NOW)
             self.assertEqual(status, parsed.status)
             self.assertEqual(case["paid_chain"], parsed.payload["paid_chain"])
+            self.assertEqual(case["paid_asset_amount"], parsed.payload["paid_asset_amount"])
+            self.assertEqual(case["paid_asset_amount_received"], parsed.payload["paid_asset_amount_received"])
             self.assertEqual(case["settlement_exchange_rate"], parsed.payload["settlement_exchange_rate"])
             with self.assertRaises(InvalidSignatureError):
                 parse_notification(raw.replace(b"1.17", b"9.99") + b" ", headers, SECRET, now=NOW)

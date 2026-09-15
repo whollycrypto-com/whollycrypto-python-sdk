@@ -34,6 +34,8 @@
   "settled_at": "2026-09-14T12:05:00Z",
   "paid_chain": "ethereum",
   "paid_asset": "USDC",
+  "paid_asset_amount": "58.17342",
+  "paid_asset_amount_received": "58.17342",
   "paid_payment_method_id": "33333333-3333-4333-8333-333333333333",
   "settlement_exchange_rate": {
     "rate": "1.17",

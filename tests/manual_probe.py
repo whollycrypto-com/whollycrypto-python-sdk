@@ -13,7 +13,7 @@ import whollycrypto
 from whollycrypto import Client
 
 assert Client is whollycrypto.Client
-assert whollycrypto.__version__ == "2.2.0"
+assert whollycrypto.__version__ == "2.3.0"
 assert Path(whollycrypto.__file__).resolve().is_relative_to(Path(__file__).resolve().parent)
 assert not any("site-packages" in path or "dist-packages" in path for path in sys.path)
 project = "11111111-1111-4111-8111-111111111111"

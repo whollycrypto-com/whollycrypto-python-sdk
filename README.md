@@ -6,7 +6,7 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.2.0** targets API **v1**, tested against merchant **5.1.0**.
+SDK **2.3.0** targets API **v1**, tested against merchant **5.3.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -21,7 +21,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.2.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.2.0.zip).
+1. [Download SDK 2.3.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.3.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:
@@ -138,18 +138,22 @@ deduplicate by public invoice ID if exporting while new invoices are arriving.
 
 ## Choose invoice payment methods
 
-On merchant 5.1.0+, restrict an invoice to methods already accepted by its store:
+On merchant 5.3.0+, use chain-specific tickers for an invoice's payment methods:
 
 ```python
 payload["payment_methods"] = [
-    {"chain_slug": "ethereum", "asset_ids": [store_usdc_asset_id]},
+    {"chain_slug": "ethereum", "asset_tickers": ["USDC", "USDT"]},
     {"chain_slug": "bitcoin", "payment_rail": "lightning"},
 ]
 ```
 
-Find `store_usdc_asset_id` in `client.list_store_payment_assets(project_id, store_id)`:
-use a selected entry's `asset.id`, not the contract, symbol or invoice method ID.
-Omit `asset_ids` for every ready accepted asset on that chain. Omit `payment_methods`
+Copy a selection from **Project → Stores → Payment methods**, or read the selected
+entries from `client.list_store_payment_assets(project_id, store_id)`.
+Tickers are trimmed and matched case-insensitively, within that chain and store.
+If two accepted contracts share a ticker, the request fails even when one is not ready.
+Use `"asset_ids": [entry["asset"]["id"]]` to disambiguate (merchant 5.1.0+).
+Never combine non-null `asset_ids` and `asset_tickers` in one selection.
+Omit both for every ready accepted asset on that chain. Omit `payment_methods`
 or use `None` for all store methods; an empty list is invalid. Bitcoin Lightning
 is separate from Bitcoin on-chain. Maximum 64 methods; disabled, wrong-chain or
 unavailable choices fail. The store is never changed. Reuse the exact payload

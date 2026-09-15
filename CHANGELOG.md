@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.0 - 2026-09-15
+
+- Add chain-scoped `asset_tickers` invoice examples for merchant 5.3.0+. Keep UUID selections for backward compatibility and ambiguous symbols.
+- Refresh the public API fixtures and document where to copy a store's chain/ticker selection. Transport and notification behavior is unchanged.
+
 ## 2.2.0 - 2026-09-15
 
 - Document per-invoice chain/asset selection for merchant 5.1.0+, including separate Bitcoin Lightning selection.

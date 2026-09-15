@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0 - 2026-09-15
+
+- Document per-invoice chain/asset selection for merchant 5.1.0+, including separate Bitcoin Lightning selection.
+- Refresh public API request fixtures and verify exact JSON lists and idempotent retries. Omitted selections retain existing behavior.
+
 ## 2.1.0 - 2026-09-14
 
 - Support merchant 4.1.0 rich IPN/webhook payload version 2, including signed event identity and project/store scope. Retained legacy events remain supported.

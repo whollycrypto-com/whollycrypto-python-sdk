@@ -1,5 +1,5 @@
 {
-  "merchant_version": "4.1.2",
+  "merchant_version": "5.1.0",
   "api_version": "v1",
   "endpoints": [
     {
@@ -457,6 +457,14 @@
       "path": "/v1/projects/{project_id}/stores/{store_id}/invoices",
       "access": "write",
       "body": {
+        "payment_methods": [
+          {
+            "chain_slug": "bitcoin",
+            "asset_ids": [
+              "10000000-0000-4000-8000-000000000001"
+            ]
+          }
+        ],
         "amount": "49.90",
         "currency": "USD",
         "order_id": "order-1042",

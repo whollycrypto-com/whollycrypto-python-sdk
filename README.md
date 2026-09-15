@@ -6,7 +6,7 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.1.0** targets API **v1**, tested against merchant **4.1.0**.
+SDK **2.2.0** targets API **v1**, tested against merchant **5.1.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -21,7 +21,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.1.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.1.0.zip).
+1. [Download SDK 2.2.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.2.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:
@@ -135,6 +135,26 @@ for invoice in client.iter_invoices(project_id, {"status": "settled"}):
 These snippets use an open `client`. Invoice paths use `invoice_id`, **not** internal
 `id` or `order_id`. `processing` is not `settled`. Pages are separate snapshots, so
 deduplicate by public invoice ID if exporting while new invoices are arriving.
+
+## Choose invoice payment methods
+
+On merchant 5.1.0+, restrict an invoice to methods already accepted by its store:
+
+```python
+payload["payment_methods"] = [
+    {"chain_slug": "ethereum", "asset_ids": [store_usdc_asset_id]},
+    {"chain_slug": "bitcoin", "payment_rail": "lightning"},
+]
+```
+
+Find `store_usdc_asset_id` in `client.list_store_payment_assets(project_id, store_id)`:
+use a selected entry's `asset.id`, not the contract, symbol or invoice method ID.
+Omit `asset_ids` for every ready accepted asset on that chain. Omit `payment_methods`
+or use `None` for all store methods; an empty list is invalid. Bitcoin Lightning
+is separate from Bitcoin on-chain. Maximum 64 methods; disabled, wrong-chain or
+unavailable choices fail. The store is never changed. Reuse the exact payload
+and idempotency key on retries.
+See [the selection schema and examples](https://www.whollycrypto.com/api/#create-invoice).
 
 ## Amounts and invoice options
 

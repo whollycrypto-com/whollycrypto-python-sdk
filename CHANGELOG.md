@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.1 - 2026-09-16
+
+- Refresh the merchant 5.4.0 contract: invoice selections ignore inactive/unaccepted choices, use store defaults when nothing matches, and include all active assets for chain-only selections.
+- Explain chain-specific readiness diagnostics and private API error access. Preserve exact amounts, idempotency, ambiguity rejection and all notification behavior.
+
 ## 2.3.0 - 2026-09-15
 
 - Add chain-scoped `asset_tickers` invoice examples for merchant 5.3.0+. Keep UUID selections for backward compatibility and ambiguous symbols.

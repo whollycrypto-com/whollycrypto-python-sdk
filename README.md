@@ -6,7 +6,7 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.3.0** targets API **v1**, tested against merchant **5.3.0**.
+SDK **2.3.1** targets API **v1**, tested against merchant **5.4.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -21,7 +21,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.3.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.3.0.zip).
+1. [Download SDK 2.3.1 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.3.1.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:
@@ -147,17 +147,22 @@ payload["payment_methods"] = [
 ]
 ```
 
-Copy a selection from **Project → Stores → Payment methods**, or read the selected
+Read the chain hint and asset ticker in **Project → Stores → Payment methods**, or read selected
 entries from `client.list_store_payment_assets(project_id, store_id)`.
 Tickers are trimmed and matched case-insensitively, within that chain and store.
 If two accepted contracts share a ticker, the request fails even when one is not ready.
 Use `"asset_ids": [entry["asset"]["id"]]` to disambiguate (merchant 5.1.0+).
 Never combine non-null `asset_ids` and `asset_tickers` in one selection.
-Omit both for every ready accepted asset on that chain. Omit `payment_methods`
-or use `None` for all store methods; an empty list is invalid. Bitcoin Lightning
-is separate from Bitcoin on-chain. Maximum 64 methods; disabled, wrong-chain or
-unavailable choices fail. The store is never changed. Reuse the exact payload
-and idempotency key on retries.
+Omit both to include all active accepted assets on that chain. Omit `payment_methods`
+or use `None` for store defaults; an empty list is invalid. Lightning is separate.
+On merchant **5.4.0+**, unknown, inactive, wrong-chain or unaccepted choices are
+ignored. If none match, the invoice uses store defaults. Active selected methods
+still need ready wallets/scanners and trustworthy rates; this never enables an asset.
+Maximum 64 methods; store settings stay unchanged. Older merchants reject unmatched
+choices. Reuse the exact payload and idempotency key on retries.
+For failed creation, inspect `APIError.api_message` and the explicit response's
+`error.details.payment_methods` for the chain, ticker and missing requirement.
+Keep these diagnostics private; do not log whole customer response bodies.
 See [the selection schema and examples](https://www.whollycrypto.com/api/#create-invoice).
 
 ## Amounts and invoice options

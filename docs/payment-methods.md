@@ -64,11 +64,15 @@ may reject editable confirmation counts.
 
 On merchant 5.3.0+, select already accepted tokens with `chain_slug` and
 `asset_tickers`, for example `{"chain_slug":"ethereum","asset_tickers":["USDC","USDT"]}`.
-Copy the object in **Project → Stores → Payment methods**, then put it inside
-the invoice's `payment_methods` array. Tickers are case-insensitive and chain-scoped.
+Find the chain hint and asset ticker in **Project → Stores → Payment methods**.
+Put your selection in `payment_methods`. Tickers are case-insensitive and chain-scoped.
 They never enable new store assets. Duplicate accepted symbols are rejected;
 use `asset_ids` with the selected entry's `asset.id` for an exact contract instead.
-Do not send both selectors. Omit both to choose all ready assets on that chain.
+Do not send both selectors. Omit both to include all active accepted assets on that chain.
+Merchant 5.4.0+ ignores unknown, inactive or unaccepted choices and uses store
+defaults if none match. Active selected assets still need ready wallets/scanners
+and trustworthy rates. Older merchants reject unmatched choices. Check the API
+error message and details.payment_methods for chain-specific diagnostics.
 See the [complete invoice example](../README.md#choose-invoice-payment-methods).
 
 ## Balances and exceptions

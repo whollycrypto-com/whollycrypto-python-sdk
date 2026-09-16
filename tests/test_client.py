@@ -21,6 +21,18 @@ from tests.helpers import ASSET, INVOICE, PROJECT, STORE, TOKEN, FakeTransport, 
 
 
 class ClientTests(unittest.TestCase):
+    def test_payment_readiness_errors_are_actionable_and_safe(self):
+        issue = {'chain_slug':'tron','asset_ticker':TOKEN,'reason_code':'scanner_provider_quorum','usable_independent_providers':1,'message':TOKEN}
+        error = APIError(400, 'invalid_payment_request', TOKEN, reply({'error':{'details':{'payment_methods':[issue, issue]}}}, 400))
+        self.assertIn('TRON: 1 of 2 independent scanner providers', str(error))
+        self.assertEqual(str(error).count('TRON:'), 1)
+        self.assertNotIn(TOKEN, repr(error))
+        self.assertEqual(error.payment_method_issues, [issue, issue])
+        for issues in [None, 1, 'bad', [{'reason_code':[]}], [{'chain_slug':TOKEN,'reason_code':'rate_unavailable','message':TOKEN}], [{'chain_slug':'tron','reason_code':'scanner_provider_quorum','usable_independent_providers':TOKEN}]]:
+            error = APIError(400, 'invalid_payment_request', TOKEN, reply({'error':{'details':{'payment_methods':issues}}}, 400))
+            self.assertNotIn(TOKEN, str(error))
+        self.assertEqual(APIError(400,'http_error',None,Response(400,{},b'not JSON')).details,{})
+
     def test_all_18_public_contracts(self):
         catalog = json.loads((Path(__file__).parent / "fixtures/api-v1.json").read_text())
         self.assertEqual(18, len(catalog["endpoints"]))

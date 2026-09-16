@@ -75,6 +75,20 @@ and trustworthy rates. Older merchants reject unmatched choices. Check the API
 error message and details.payment_methods for chain-specific diagnostics.
 See the [complete invoice example](../README.md#choose-invoice-payment-methods).
 
+## Receiving diagnostics
+
+Merchant 5.5.0+ includes `receive_readiness` in scoped asset and wallet listings.
+It describes cached receiving requirements, not balances or sending/gas checks.
+Invoice creation rechecks requirements and rates for its currency. A healthy
+TRON full node alone is not a history indexer for payment discovery.
+
+SDK 2.4.0+ gives `str(APIError)` a safe, actionable summary. Inspect
+`error.payment_method_issues` for structured chain, ticker, reason code and
+provider requirements, or `error.details` for the full details object.
+Treat explicit server details as untrusted data: escape before rendering and
+do not log full responses or customer data. Fix the named configuration, then
+retry with the **same idempotency key**. Never disable scanner checks.
+
 ## Balances and exceptions
 
 ```python

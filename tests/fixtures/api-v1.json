@@ -1,5 +1,5 @@
 {
-  "merchant_version": "5.4.0",
+  "merchant_version": "5.5.0",
   "api_version": "v1",
   "endpoints": [
     {
@@ -117,7 +117,21 @@
               "late_monitoring_days": 30
             },
             "wallet": null,
-            "wallet_readiness": "wallet_missing"
+            "wallet_readiness": "wallet_missing",
+            "receive_readiness": {
+              "ready": false,
+              "checked_at": "2026-09-16T09:00:00Z",
+              "issues": [
+                {
+                  "chain_slug": "ethereum",
+                  "asset_id": "10000000-0000-4000-8000-000000000003",
+                  "asset_ticker": "ETH",
+                  "reason_code": "wallet_missing",
+                  "message": "ethereum / ETH: Create a project wallet for this chain.",
+                  "action": "wallets"
+                }
+              ]
+            }
           }
         ]
       }

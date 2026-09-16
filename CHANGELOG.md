@@ -1,4 +1,10 @@
 # Changelog
+## 2.4.0 - 2026-09-16
+
+- Safe actionable invoice error summaries for scanner, wallet and rate prerequisites.
+- Add `details` and `payment_method_issues`; raw remote text stays out of default logs.
+- Document merchant 5.5.0 receive readiness. Python 3.10+ and API/idempotency compatibility retained.
+
 
 ## 2.3.1 - 2026-09-16
 

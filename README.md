@@ -6,7 +6,7 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.3.1** targets API **v1**, tested against merchant **5.4.0**.
+SDK **2.4.0** targets API **v1**, tested against merchant **5.5.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -21,7 +21,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.3.1 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.3.1.zip).
+1. [Download SDK 2.4.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.4.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:
@@ -160,8 +160,10 @@ ignored. If none match, the invoice uses store defaults. Active selected methods
 still need ready wallets/scanners and trustworthy rates; this never enables an asset.
 Maximum 64 methods; store settings stay unchanged. Older merchants reject unmatched
 choices. Reuse the exact payload and idempotency key on retries.
-For failed creation, inspect `APIError.api_message` and the explicit response's
-`error.details.payment_methods` for the chain, ticker and missing requirement.
+SDK 2.4.0+ includes safe scanner/wallet/rate guidance in `str(APIError)`.
+For failed creation, inspect `error.payment_method_issues` for the chain, ticker,
+`reason_code`, provider counts and action. `error.details` and `error.api_message`
+are explicit private diagnostics, not default log text.
 Keep these diagnostics private; do not log whole customer response bodies.
 See [the selection schema and examples](https://www.whollycrypto.com/api/#create-invoice).
 

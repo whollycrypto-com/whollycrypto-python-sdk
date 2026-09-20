@@ -6,7 +6,7 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.4.0** targets API **v1**, tested against merchant **5.5.0**.
+SDK **2.5.0** targets API **v1**, tested against merchant **5.6.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -21,7 +21,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.4.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.4.0.zip).
+1. [Download SDK 2.5.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.5.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:
@@ -190,6 +190,8 @@ payload = {
         "company": "Example GmbH", "vatid": "DE123456789",
     },
     "checkout_appearance": {
+        "show_project_name": True,
+        "show_store_name": False,
         "title": "Complete your order", "intro": "Thanks for choosing us.",
         "outro": "Questions? https://your-shop.com/help",
         "intro_font_size": 18, "outro_font_size": 16,
@@ -210,6 +212,12 @@ the server binds idempotency to the original credential and **exact raw JSON byt
 `Client.new_idempotency_key()` generates a key; you must persist it before use.
 
 ## Merchant API methods
+
+Merchant 5.6.0 adds these name-visibility controls. They affect the checkout header,
+not identity fields in JSON. In **Store → Basic → Store domains**, choose preferred
+checkout and API hosts. Links use this store, then its default store, then the
+system primary; only active domains qualify. Set your SDK base URL to the preferred
+API host. Already-signed callback retries keep their original links.
 
 | Method | Purpose |
 | --- | --- |

@@ -1,4 +1,11 @@
 # Changelog
+
+## 2.5.0 - 2026-09-20
+
+- Document merchant 5.6.0 store-specific checkout/API domains and unchanged signed callback links on retry.
+- Support checkout `show_project_name` and `show_store_name` appearance controls; Node includes typed fields.
+- Preserve decimal precision, idempotency, signing and supported runtime versions.
+
 ## 2.4.0 - 2026-09-16
 
 - Safe actionable invoice error summaries for scanner, wallet and rate prerequisites.

@@ -61,7 +61,7 @@ Merchant 4.1.0 adds signed event identity, actual chain/token transfers, exact a
 | underpayment_tolerance_percent | decimal string | Locked invoice tolerance; each method also reports its effective tolerance |
 | reason_code | string \| null | Machine-readable state-transition reason |
 | requires_review | boolean | Payment exception hint; not permission to fulfil or refund automatically |
-| links | object | checkout, authenticated invoice and payments URLs at event creation; null if no active host record |
+| links | object | Checkout, authenticated invoice and payments URLs at event creation. Store → Basic domain preferences apply, then the default store, then the global primary; only active role-matched domains are used. Retries retain the original signed links; null if no active host record. |
 | payment_info | object | Actual observed methods, exact amounts, locked quote, advisory market snapshot and bounded payment observations; see field groups below |
 
 ### Amounts and payment history

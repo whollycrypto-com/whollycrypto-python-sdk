@@ -4,6 +4,12 @@ Use [webhook_wsgi.py](webhook_wsgi.py) as a receiver and [notification.json](not
 
 [Setup guide](https://www.whollycrypto.com/documentation/#delivery-history) · [Full field reference](https://www.whollycrypto.com/api/#notifications) · Your console: `/settings/api/docs/#notifications`.
 
+## When should I fulfil an order?
+
+**For event-based handling, use event_type = invoice.settled together with status = settled to trigger an order check. Verify the current invoice and fulfil each order only once.**
+
+status is the invoice state when the event was created. event_type tells you what happened. payment.received can carry processing or settled; it does not mean a second payment and is not an independent fulfilment signal.
+
 ## Choose the receiver
 
 IPN sends every generated invoice event to the invoice's `ipn_url`, or the store default when inherited. It uses the **Store → IPN signing secret**. Webhooks send selected events and each endpoint has **its own signing secret**. Neither uses your API token. Choose the secret from trusted configuration, never unverified request data.
@@ -18,7 +24,79 @@ IPN sends every generated invoice event to the invoice's `ipn_url`, or the store
 | invoice.invalid | invalid | Cannot be accepted automatically, payment evidence was lost, or a merchant rejected it. Review the invoice. |
 | invoice.cancelled | cancelled | Invoice cancelled. Do not fulfil; a cancellation does not refund an on-chain payment. |
 
-An amount can be paid while the invoice is still processing. Fulfil only after verified `settled` status and your order checks. Reorgs and late, partial or excess payments may need review. Confirmation changes do not guarantee an event on every block.
+An amount can be paid while the invoice is still processing. Fulfil only after verified `settled` status and your order checks. Confirmation changes do not guarantee an event on every block.
+
+## Why Ethereum and Solana can send different event flows
+
+### Confirmations arrive later (Ethereum example)
+
+| Sequence | event_type | status |
+| --- | --- | --- |
+| 1 | invoice.created | new |
+| 2 | payment.received | processing |
+| 2 | invoice.processing | processing |
+| 3 | invoice.settled | settled |
+
+### Already final when detected (Solana example)
+
+| Sequence | event_type | status |
+| --- | --- | --- |
+| 1 | invoice.created | new |
+| 2 | payment.received | settled |
+| 2 | invoice.settled | settled |
+
+These show event creation, not guaranteed delivery order. Either flow can happen on other chains depending on detection timing and settlement policy. Do not require a processing event before settled.
+
+## Fulfil once: choose one receiver approach
+
+| Approach | How to handle it |
+| --- | --- |
+| Event-based receiver | Keep distinct events by signed event_id, then select invoice.settled with status = settled. Do not discard this event because payment.received with the same sequence arrived first. |
+| SDK order-state inbox | The supplied PHP, Python and Node receiver examples collapse project + invoice_id + sequence. Process the saved state regardless of event_type, fetch the current invoice, and fulfil once if settled. Do not add an invoice.settled-only filter after this collapse. |
+
+A retry keeps event_id and the original body. Different events can share sequence but have different event_id values. Deduplicate deliveries by signed event_id for event-based handling; independently guard fulfilment by configured installation/project + invoice_id and your order. A later re-settlement must not credit the order twice.
+
+The following is pseudocode, not a drop-in receiver. Use the state-based worker with the supplied [webhook_wsgi.py](webhook_wsgi.py); use the event-based worker only with an inbox that preserves distinct signed event IDs.
+
+```text
+HTTP receiver:
+  Verify raw-body signature, timestamp and configured project/store scope.
+  Save to a durable inbox; deduplicate the signed event_id.
+  Return HTTP 2xx only after persistence succeeds.
+
+Event-based background worker:
+  Other events go to status/reconciliation handling, not fulfilment.
+  Continue here only for event_type = invoice.settled and status = settled.
+  Fetch the current invoice from your configured API origin.
+  Check settled status, project/store, order, amount, currency and review policy.
+  In one database transaction:
+    Lock the order and check the scoped invoice has not been fulfilled.
+    Credit/complete once and save the fulfilment record.
+    Queue any external fulfilment with the same business idempotency key.
+
+SDK order-state worker:
+  Use the same current-invoice checks and fulfil-once transaction.
+  Do not filter event_type after collapsing events by invoice revision.
+```
+
+## All invoice states and payment exceptions
+
+| Field | Values | Meaning |
+| --- | --- | --- |
+| status | new, processing, settled, expired, invalid, cancelled | Invoice state at event creation; not necessarily its current state at delivery. |
+| amount_status | none, partial, paid, overpaid | Amount received, including accepted tolerance. paid is not confirmation finality. |
+| timing_status | on_time, late | Whether payment met the invoice deadline. |
+| resolution | automatic, manually_settled, manually_invalidated | Whether normal rules or a manual acceptance/rejection determined the result. |
+| requires_review | false, true | Exception hint, not another invoice status or automatic permission to fulfil/refund. |
+
+| Situation | Handling |
+| --- | --- |
+| Underpayment / tolerance | Under automatic rules, partial does not settle. paid can include an accepted shortfall, but finality is still required. Use invoice status, not an amount comparison alone. |
+| Overpayment | overpaid can coexist with settled and requires_review = true. Apply your excess-payment policy; never credit the order twice or automatically refund an unverified address. |
+| Late payment | expired can later change while monitoring continues. timing_status = late flags review; do not automatically reopen or ship a cancelled order. |
+| Manual acceptance | invoice.settled can have resolution = manually_settled without qualifying on-chain funds. Decide whether your integration accepts this override; payment summary fields may be null. |
+| Reorg / invalidation | A newer revision can invalidate earlier payment evidence. Re-fetch current state and handle reversal through reconciliation. Do not ignore it just because the order was once settled. |
+| Zero confirmations / zero amount | Zero-confirmation settlement can happen on detection and carries reorg risk. An explicitly allowed zero-amount invoice settles without a payment. Neither requires a payment.received event first. |
 
 ## Version 2 payload
 
@@ -52,8 +130,8 @@ Merchant 4.1.0 adds signed event identity, actual chain/token transfers, exact a
 | settled_at | timestamp \| null | Settlement time |
 | paid_chain | string \| null | 4.1.2+: chain slug of the proven settling method, e.g. ethereum; null without a saved qualifying settlement |
 | paid_asset | string \| null | 4.1.2+: native coin or token ticker, e.g. BTC, ETH or USDC; a display label, not unique asset identity |
-| paid_asset_amount | decimal string \| null | 5.0.1+: full locked quote in paid_asset units, not the tolerance threshold or remaining balance; saved at settlement |
-| paid_asset_amount_received | decimal string \| null | 5.0.1+: actual valid receipts for the winning method at settlement, including accepted shortfalls or excess; frozen, not a live balance |
+| paid_asset_amount | decimal string \| null | 5.0.1+: full locked amount requested in paid_asset units, before subtracting tolerance; saved at settlement |
+| paid_asset_amount_received | decimal string \| null | 5.0.1+: total valid amount received for the winning method at settlement, including accepted shortfalls/excess; frozen, not a live balance |
 | paid_payment_method_id | UUID \| null | 4.1.2+: settling intent ID; matches payment_info.methods[].payment_method_id and its exact network/contract |
 | settlement_exchange_rate | object \| null | 4.1.2+: saved before-spread market snapshot at settlement, with explicit units, currency, source timestamps and quality flags; never repriced on delivery |
 | cancelled_at | timestamp \| null | Cancellation time |
@@ -101,8 +179,8 @@ The summary fields are null before settlement, after invalidation, for older set
 1. Verify the exact raw body bytes, timestamp and HMAC before parsing or storing. Use a 300-second clock tolerance and reject invalid signatures. Proxy/body-parser rewrites break verification.
 2. Event/delivery headers are **not signed**. Version 2 has a signed `event_id`, `event_type`, `project_id` and `store_id` in the body; the SDK rejects an event-header/body mismatch. Match project/store to your configured receiver. For legacy events, use configured scope plus signed invoice ID/sequence, not a header-only identity.
 3. Commit to a private durable inbox before returning 2xx. On storage failure return an error so Wholly Crypto retries. Do not fulfil an order in the HTTP handler.
-4. The supplied order-state inbox deduplicates by configured project + `invoice_id` + `sequence`. Different event types may share that revision. Compare the original nine invoice-state fields, **not the whole JSON body**; event IDs, rates and formatting can differ. Retain the original raw body privately. A changed status/amount at the same revision requires review. If you need every event, deduplicate on the signed v2 event ID instead and still guard fulfilment separately.
-5. Re-fetch the invoice from your **configured API origin**, match project, store, order, amount and currency, then fulfil once in a database transaction. Never send a bearer token to an arbitrary URL in a callback. Ignore stale revisions; a checkout redirect is not proof of payment. Reconcile reversals explicitly, not by fulfilling again.
+4. The supplied order-state inbox deduplicates by configured project + `invoice_id` + `sequence`. Different event types may share that revision. Compare the original nine invoice-state fields, **not the whole JSON body**; event IDs, rates and formatting can differ. Retain the original raw body privately. A changed status/amount at the same revision requires review. Do not add an `invoice.settled`-only filter after this collapse: `payment.received` may already represent that settled revision. For event-based processing, preserve distinct signed v2 event IDs instead and still guard fulfilment separately.
+5. Re-fetch the invoice from your **configured API origin**, require current `settled` status, match project, store, order, amount and currency, and apply your exception/manual-acceptance policy. Fulfil once in a database transaction. Never send a bearer token to an arbitrary URL in a callback. Ignore stale revisions; a checkout redirect is not proof of payment. Reconcile reversals explicitly, not by fulfilling again.
 6. Metadata and customer fields are private merchant data. Do not put secrets in metadata or log whole bodies publicly. Callbacks never add wallet keys, recovery words, provider credentials or Lightning preimages. Explorer links are public; protect your own retained customer data.
 
 Delivery is at-least-once, can be delayed/out of order, and keeps the original snapshot on retries and manual redelivery. Signatures use a fresh delivery timestamp. Saved payloads expire after 90 days; an expired body cannot be reconstructed or resent. Low processing credits pause notifications, not customer payments. Review failed deliveries in the console's store or invoice history.

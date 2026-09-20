@@ -8,6 +8,9 @@ directory outside your web root for the database. It is not a fulfilment worker:
 your worker must re-fetch the invoice, match the stored order/project/store/amount
 and update order state transactionally exactly once. Retain replay guards for at
 least your application's entire delivery/redelivery window.
+This inbox groups invoice revisions, not events. Do not filter event_type after
+grouping: payment.received may already carry settled with the same sequence as
+invoice.settled. Check current state and fulfil once. See ipn-webhooks.md.
 """
 
 from __future__ import annotations

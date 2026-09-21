@@ -81,6 +81,15 @@ SDK order-state worker:
 
 ## All invoice states and payment exceptions
 
+Merchant 5.13.3 excludes verified internal gas-funding transfers from customer
+payment totals, `payment_info`, invoice payment history, refund limits and
+`payment.received` events. Wallet and treasury records retain the actual transfers.
+Ordinary incoming transfers and genuine overpayments still count. Existing signed
+callback bodies are never rewritten. If an older settlement depended on internal
+funding instead of customer funds, reconciliation emits `invoice.invalid` with
+`reason_code: internal_gas_funding_excluded`; review it instead of fulfilling again.
+The payload shape is unchanged and no SDK upgrade is needed.
+
 | Field | Values | Meaning |
 | --- | --- | --- |
 | status | new, processing, settled, expired, invalid, cancelled | Invoice state at event creation; not necessarily its current state at delivery. |

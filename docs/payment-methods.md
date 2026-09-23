@@ -70,8 +70,11 @@ They never enable new store assets. Duplicate accepted symbols are rejected;
 use `asset_ids` with the selected entry's `asset.id` for an exact contract instead.
 Do not send both selectors. Omit both to include all active accepted assets on that chain.
 Merchant 5.4.0+ ignores unknown, inactive or unaccepted choices and uses store
-defaults if none match. Active selected assets still need ready wallets/scanners
-and trustworthy rates. Older merchants reject unmatched choices. Check the API
+defaults if none match. Active selected assets still need configured wallets
+and trustworthy rates. Merchant 6.0.6+ keeps on-chain methods during temporary
+scanner outages; detection waits for verified recovery. `invoice_creatable`
+distinguishes this from live `ready`. Monero/Lightning still need their service
+to issue requests. Older merchants reject unmatched choices. Check the API
 error message and details.payment_methods for chain-specific diagnostics.
 See the [complete invoice example](../README.md#choose-invoice-payment-methods).
 

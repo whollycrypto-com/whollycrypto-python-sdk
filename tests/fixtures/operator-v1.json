@@ -1,0 +1,1239 @@
+{
+  "merchant_version": "7.4.0",
+  "methods": [
+    {
+      "name": "capabilities",
+      "method": "GET",
+      "path": "/v1/operator/capabilities",
+      "ids": [],
+      "id": "operator-capabilities",
+      "public_path": "/v1/operator/capabilities",
+      "access": "read",
+      "body": null,
+      "response": {
+        "api_version": "v1",
+        "operator_version": "7.4.0",
+        "scopes": [
+          "health.read"
+        ],
+        "all_merchants": false,
+        "merchant_ids": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "onboarding": [
+          "direct",
+          "invitation"
+        ],
+        "write_methods": [
+          "POST"
+        ],
+        "idempotency_required": true
+      }
+    },
+    {
+      "name": "health",
+      "method": "GET",
+      "path": "/v1/operator/health",
+      "ids": [],
+      "id": "operator-health",
+      "public_path": "/v1/operator/health",
+      "access": "read",
+      "body": null,
+      "response": {
+        "version": "7.4.0",
+        "nodes": []
+      }
+    },
+    {
+      "name": "listMerchants",
+      "method": "GET",
+      "path": "/v1/operator/merchants",
+      "ids": [],
+      "id": "operator-list-merchants",
+      "public_path": "/v1/operator/merchants",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createMerchant",
+      "method": "POST",
+      "path": "/v1/operator/merchants",
+      "ids": [],
+      "id": "operator-create-merchant",
+      "public_path": "/v1/operator/merchants",
+      "access": "write",
+      "body": {
+        "name": "Example shop",
+        "email": "admin@example.test",
+        "onboarding": "direct",
+        "password": "REPLACE_WITH_A_UNIQUE_TEMPORARY_PASSWORD",
+        "require_password_change": true,
+        "currency": "EUR",
+        "starting_credit": "0",
+        "external_id": "customer-1042"
+      },
+      "response": {
+        "merchant_id": "11111111-1111-4111-8111-111111111111",
+        "user_id": "22222222-2222-4222-8222-222222222222",
+        "merchant": {
+          "id": "11111111-1111-4111-8111-111111111111",
+          "name": "Example shop",
+          "currency": "EUR",
+          "balance": "0"
+        },
+        "onboarding": "direct",
+        "access_link": null,
+        "email_delivery": {
+          "status": "not_requested"
+        },
+        "custody_acceptance_required": true
+      }
+    },
+    {
+      "name": "getMerchant",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-get-merchant",
+      "public_path": "/v1/operator/merchants/{merchant_id}",
+      "access": "read",
+      "body": null,
+      "response": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "name": "Example shop",
+        "currency": "EUR",
+        "balance": "10",
+        "fee_bps": 300,
+        "enabled": true,
+        "payments_paused": false,
+        "external_id": "customer-1042"
+      }
+    },
+    {
+      "name": "updateMerchant",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-update-merchant",
+      "public_path": "/v1/operator/merchants/{merchant_id}",
+      "access": "write",
+      "body": {
+        "payments_paused": true
+      },
+      "response": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "name": "Example shop",
+        "currency": "EUR",
+        "balance": "10",
+        "fee_bps": 300,
+        "enabled": true,
+        "payments_paused": false
+      }
+    },
+    {
+      "name": "listUsers",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/users",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-list-users",
+      "public_path": "/v1/operator/merchants/{merchant_id}/users",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createUser",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/users",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-create-user",
+      "public_path": "/v1/operator/merchants/{merchant_id}/users",
+      "access": "write",
+      "body": {
+        "email": "staff@example.test",
+        "display_name": "Store team",
+        "onboarding": "invitation",
+        "access_level": "projects",
+        "project_ids": [
+          "11111111-1111-4111-8111-111111111111"
+        ],
+        "send_invitation_email": false
+      },
+      "response": {
+        "user": {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "merchant_id": "11111111-1111-4111-8111-111111111111",
+          "email": "admin@example.test",
+          "display_name": "Shop administrator",
+          "access_level": "admin",
+          "project_ids": [],
+          "enabled": true,
+          "password_setup_required": false,
+          "custody_acceptance_required": true,
+          "password_change_required": true
+        },
+        "user_id": "22222222-2222-4222-8222-222222222222",
+        "access_link": null,
+        "email_delivery": {
+          "status": "not_requested"
+        },
+        "merchant_id": "11111111-1111-4111-8111-111111111111"
+      }
+    },
+    {
+      "name": "getUser",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/users/{userId}",
+      "ids": [
+        "merchantId",
+        "userId"
+      ],
+      "id": "operator-get-user",
+      "public_path": "/v1/operator/merchants/{merchant_id}/users/{user_id}",
+      "access": "read",
+      "body": null,
+      "response": {
+        "id": "22222222-2222-4222-8222-222222222222",
+        "merchant_id": "11111111-1111-4111-8111-111111111111",
+        "email": "admin@example.test",
+        "display_name": "Shop administrator",
+        "access_level": "admin",
+        "project_ids": [],
+        "enabled": true,
+        "password_setup_required": false,
+        "custody_acceptance_required": true,
+        "password_change_required": true
+      }
+    },
+    {
+      "name": "updateUser",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/users/{userId}",
+      "ids": [
+        "merchantId",
+        "userId"
+      ],
+      "id": "operator-update-user",
+      "public_path": "/v1/operator/merchants/{merchant_id}/users/{user_id}",
+      "access": "write",
+      "body": {
+        "display_name": "Store manager"
+      },
+      "response": {
+        "id": "22222222-2222-4222-8222-222222222222",
+        "merchant_id": "11111111-1111-4111-8111-111111111111",
+        "email": "admin@example.test",
+        "display_name": "Shop administrator",
+        "access_level": "admin",
+        "project_ids": [],
+        "enabled": true,
+        "password_setup_required": false,
+        "custody_acceptance_required": true,
+        "password_change_required": true
+      }
+    },
+    {
+      "name": "setUserPassword",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/users/{userId}/password",
+      "ids": [
+        "merchantId",
+        "userId"
+      ],
+      "id": "operator-set-user-password",
+      "public_path": "/v1/operator/merchants/{merchant_id}/users/{user_id}/password",
+      "access": "write",
+      "body": {
+        "password": "REPLACE_WITH_A_NEW_UNIQUE_PASSWORD",
+        "require_password_change": true
+      },
+      "response": {
+        "user_id": "11111111-1111-4111-8111-111111111111",
+        "sessions_revoked": true,
+        "totp_preserved": true
+      }
+    },
+    {
+      "name": "revokeUserSessions",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/users/{userId}/revoke-sessions",
+      "ids": [
+        "merchantId",
+        "userId"
+      ],
+      "id": "operator-revoke-user-sessions",
+      "public_path": "/v1/operator/merchants/{merchant_id}/users/{user_id}/revoke-sessions",
+      "access": "write",
+      "body": {},
+      "response": {
+        "user_id": "11111111-1111-4111-8111-111111111111",
+        "sessions_revoked": true,
+        "totp_preserved": true
+      }
+    },
+    {
+      "name": "listInvitations",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/invitations",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-list-invitations",
+      "public_path": "/v1/operator/merchants/{merchant_id}/invitations",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createInvitation",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/invitations",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-create-invitation",
+      "public_path": "/v1/operator/merchants/{merchant_id}/invitations",
+      "access": "write",
+      "body": {
+        "user_id": "11111111-1111-4111-8111-111111111111",
+        "send_email": false
+      },
+      "response": {
+        "user_id": "22222222-2222-4222-8222-222222222222",
+        "email": "admin@example.test",
+        "kind": "invitation",
+        "expires_at": "2026-10-03T12:00:00Z",
+        "url": "https://merchant.example.com/account-access.html#token=YOUR_PRIVATE_INVITATION_TOKEN"
+      }
+    },
+    {
+      "name": "getInvitation",
+      "method": "GET",
+      "path": "/v1/operator/invitations/{invitationId}",
+      "ids": [
+        "invitationId"
+      ],
+      "id": "operator-get-invitation",
+      "public_path": "/v1/operator/invitations/{invitation_id}",
+      "access": "read",
+      "body": null,
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "user_id": "22222222-2222-4222-8222-222222222222",
+        "merchant_id": "11111111-1111-4111-8111-111111111111",
+        "kind": "invitation",
+        "status": "pending",
+        "created_at": "2026-10-01T12:00:00Z",
+        "expires_at": "2026-10-03T12:00:00Z"
+      }
+    },
+    {
+      "name": "resendInvitation",
+      "method": "POST",
+      "path": "/v1/operator/invitations/{invitationId}/resend",
+      "ids": [
+        "invitationId"
+      ],
+      "id": "operator-resend-invitation",
+      "public_path": "/v1/operator/invitations/{invitation_id}/resend",
+      "access": "write",
+      "body": {
+        "send_email": false
+      },
+      "response": {
+        "user_id": "22222222-2222-4222-8222-222222222222",
+        "email": "admin@example.test",
+        "kind": "invitation",
+        "expires_at": "2026-10-03T12:00:00Z",
+        "url": "https://merchant.example.com/account-access.html#token=YOUR_PRIVATE_INVITATION_TOKEN"
+      }
+    },
+    {
+      "name": "revokeInvitation",
+      "method": "POST",
+      "path": "/v1/operator/invitations/{invitationId}/revoke",
+      "ids": [
+        "invitationId"
+      ],
+      "id": "operator-revoke-invitation",
+      "public_path": "/v1/operator/invitations/{invitation_id}/revoke",
+      "access": "write",
+      "body": {},
+      "response": {
+        "revoked": true,
+        "invitation_id": "44444444-4444-4444-8444-444444444444"
+      }
+    },
+    {
+      "name": "getCredits",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/credits",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-get-credits",
+      "public_path": "/v1/operator/merchants/{merchant_id}/credits",
+      "access": "read",
+      "body": null,
+      "response": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "name": "Example shop",
+        "currency": "EUR",
+        "balance": "10",
+        "fee_bps": 300,
+        "enabled": true,
+        "payments_paused": false,
+        "external_id": "customer-1042"
+      }
+    },
+    {
+      "name": "listCreditLedger",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/credits/ledger",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-list-credit-ledger",
+      "public_path": "/v1/operator/merchants/{merchant_id}/credits/ledger",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "adjustCredits",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/credits/adjustments",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-adjust-credits",
+      "public_path": "/v1/operator/merchants/{merchant_id}/credits/adjustments",
+      "access": "write",
+      "body": {
+        "amount": "10.00",
+        "note": "Promotional credit",
+        "request_id": "11111111-1111-4111-8111-111111111111"
+      },
+      "response": {
+        "balance": "25"
+      }
+    },
+    {
+      "name": "listTopups",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/topups",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-list-topups",
+      "public_path": "/v1/operator/merchants/{merchant_id}/topups",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createTopup",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/topups",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-create-topup",
+      "public_path": "/v1/operator/merchants/{merchant_id}/topups",
+      "access": "write",
+      "body": {
+        "amount": "25.00",
+        "request_id": "11111111-1111-4111-8111-111111111111"
+      },
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "invoice_id": "33333333-3333-4333-8333-333333333333",
+        "checkout_url": "https://pay.example.com/invoice/33333333-3333-4333-8333-333333333333"
+      }
+    },
+    {
+      "name": "getTopup",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/topups/{topupId}",
+      "ids": [
+        "merchantId",
+        "topupId"
+      ],
+      "id": "operator-get-topup",
+      "public_path": "/v1/operator/merchants/{merchant_id}/topups/{topup_id}",
+      "access": "read",
+      "body": null,
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "merchant_id": "11111111-1111-4111-8111-111111111111",
+        "invoice_id": "33333333-3333-4333-8333-333333333333",
+        "amount": "25",
+        "currency": "EUR",
+        "status": "pending",
+        "invoice_status": "new",
+        "checkout_url": "https://pay.example.com/invoice/33333333-3333-4333-8333-333333333333"
+      }
+    },
+    {
+      "name": "reports",
+      "method": "GET",
+      "path": "/v1/operator/reports",
+      "ids": [],
+      "id": "operator-reports",
+      "public_path": "/v1/operator/reports",
+      "access": "read",
+      "body": null,
+      "response": {
+        "summary": {
+          "fees": "10",
+          "costs": "3",
+          "margin": "7",
+          "credits": "25",
+          "pending": 0,
+          "missing_rates": 0
+        },
+        "merchants": [],
+        "filters": {
+          "period": "last30",
+          "currency": "EUR",
+          "timezone": "UTC"
+        },
+        "basis": "first_settlement_latest_net_fees"
+      }
+    },
+    {
+      "name": "listAudit",
+      "method": "GET",
+      "path": "/v1/operator/audit",
+      "ids": [],
+      "id": "operator-list-audit",
+      "public_path": "/v1/operator/audit",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "listEvents",
+      "method": "GET",
+      "path": "/v1/operator/events",
+      "ids": [],
+      "id": "operator-list-events",
+      "public_path": "/v1/operator/events",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "listWebhooks",
+      "method": "GET",
+      "path": "/v1/operator/webhooks",
+      "ids": [],
+      "id": "operator-list-webhooks",
+      "public_path": "/v1/operator/webhooks",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createWebhook",
+      "method": "POST",
+      "path": "/v1/operator/webhooks",
+      "ids": [],
+      "id": "operator-create-webhook",
+      "public_path": "/v1/operator/webhooks",
+      "access": "write",
+      "body": {
+        "url": "https://shop.example.test/operator-events",
+        "events": [
+          "merchant.created",
+          "topup.settled"
+        ],
+        "merchant_ids": [],
+        "enabled": true
+      },
+      "response": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "signing_secret": "wco_whsec_EXAMPLE_ONLY_SAVE_ONCE"
+      }
+    },
+    {
+      "name": "updateWebhook",
+      "method": "POST",
+      "path": "/v1/operator/webhooks/{webhookId}",
+      "ids": [
+        "webhookId"
+      ],
+      "id": "operator-update-webhook",
+      "public_path": "/v1/operator/webhooks/{webhook_id}",
+      "access": "write",
+      "body": {
+        "url": "https://shop.example.test/operator-events",
+        "events": [
+          "topup.settled"
+        ],
+        "merchant_ids": [],
+        "enabled": false
+      },
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "signing_secret": null
+      }
+    },
+    {
+      "name": "rotateWebhookSecret",
+      "method": "POST",
+      "path": "/v1/operator/webhooks/{webhookId}/rotate",
+      "ids": [
+        "webhookId"
+      ],
+      "id": "operator-rotate-webhook-secret",
+      "public_path": "/v1/operator/webhooks/{webhook_id}/rotate",
+      "access": "write",
+      "body": {},
+      "response": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "signing_secret": "wco_whsec_EXAMPLE_ONLY_SAVE_ONCE"
+      }
+    },
+    {
+      "name": "listWebhookDeliveries",
+      "method": "GET",
+      "path": "/v1/operator/webhooks/{webhookId}/deliveries",
+      "ids": [
+        "webhookId"
+      ],
+      "id": "operator-list-webhook-deliveries",
+      "public_path": "/v1/operator/webhooks/{webhook_id}/deliveries",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "listProjects",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-list-projects",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createProject",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-create-project",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects",
+      "access": "write",
+      "body": {
+        "name": "Online shop",
+        "slug": "online-shop",
+        "enabled": false
+      },
+      "response": {
+        "id": "33333333-3333-4333-8333-333333333333",
+        "slug": "example-shop",
+        "name": "Example shop",
+        "enabled": false,
+        "reporting_currency": "EUR",
+        "reporting_timezone": "Europe/Berlin",
+        "stores": []
+      }
+    },
+    {
+      "name": "getProject",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}",
+      "ids": [
+        "merchantId",
+        "projectId"
+      ],
+      "id": "operator-get-project",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}",
+      "access": "read",
+      "body": null,
+      "response": {
+        "id": "33333333-3333-4333-8333-333333333333",
+        "slug": "example-shop",
+        "name": "Example shop",
+        "enabled": false,
+        "reporting_currency": "EUR",
+        "reporting_timezone": "Europe/Berlin",
+        "stores": []
+      }
+    },
+    {
+      "name": "updateProject",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}",
+      "ids": [
+        "merchantId",
+        "projectId"
+      ],
+      "id": "operator-update-project",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}",
+      "access": "write",
+      "body": {
+        "enabled": true
+      },
+      "response": {
+        "id": "33333333-3333-4333-8333-333333333333",
+        "slug": "example-shop",
+        "name": "Example shop",
+        "enabled": false,
+        "reporting_currency": "EUR",
+        "reporting_timezone": "Europe/Berlin",
+        "stores": []
+      }
+    },
+    {
+      "name": "listStores",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores",
+      "ids": [
+        "merchantId",
+        "projectId"
+      ],
+      "id": "operator-list-stores",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createStore",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores",
+      "ids": [
+        "merchantId",
+        "projectId"
+      ],
+      "id": "operator-create-store",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores",
+      "access": "write",
+      "body": {
+        "name": "Web checkout",
+        "slug": "web-checkout",
+        "default_currency": "EUR",
+        "enabled": false
+      },
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "project_id": "33333333-3333-4333-8333-333333333333",
+        "slug": "online",
+        "name": "Online shop",
+        "enabled": false,
+        "default_currency": "EUR",
+        "invoice_expiry_minutes": 60
+      }
+    },
+    {
+      "name": "getStore",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-get-store",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}",
+      "access": "read",
+      "body": null,
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "project_id": "33333333-3333-4333-8333-333333333333",
+        "slug": "online",
+        "name": "Online shop",
+        "enabled": false,
+        "default_currency": "EUR",
+        "invoice_expiry_minutes": 60
+      }
+    },
+    {
+      "name": "updateStore",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-update-store",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}",
+      "access": "write",
+      "body": {
+        "enabled": true
+      },
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "project_id": "33333333-3333-4333-8333-333333333333",
+        "slug": "online",
+        "name": "Online shop",
+        "enabled": false,
+        "default_currency": "EUR",
+        "invoice_expiry_minutes": 60
+      }
+    },
+    {
+      "name": "getStoreAppearance",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}/checkout-appearance",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-get-store-appearance",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}/checkout-appearance",
+      "access": "read",
+      "body": null,
+      "response": {
+        "revision": 1,
+        "settings": {
+          "inherit_default_store": true
+        },
+        "effective": {
+          "title": "Pay securely"
+        }
+      }
+    },
+    {
+      "name": "updateStoreAppearance",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}/checkout-appearance",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-update-store-appearance",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}/checkout-appearance",
+      "access": "write",
+      "body": {
+        "revision": 1,
+        "settings": {
+          "inherit_default_store": false,
+          "title": "Pay securely",
+          "theme": "light"
+        }
+      },
+      "response": {
+        "settings": {
+          "inherit_default_store": false,
+          "title": "Pay securely",
+          "theme": "light"
+        },
+        "revision": 2
+      }
+    },
+    {
+      "name": "listStorePaymentAssets",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}/payment-assets",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-list-store-payment-assets",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}/payment-assets",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": []
+      }
+    },
+    {
+      "name": "updateStorePaymentAssets",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}/payment-assets",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-update-store-payment-assets",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}/payment-assets",
+      "access": "write",
+      "body": {
+        "assets": [
+          {
+            "asset_id": "11111111-1111-4111-8111-111111111111",
+            "display_order": 0
+          }
+        ]
+      },
+      "response": {
+        "data": []
+      }
+    },
+    {
+      "name": "listStoreWebhooks",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}/webhooks",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-list-store-webhooks",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}/webhooks",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createStoreWebhook",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}/webhooks",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId"
+      ],
+      "id": "operator-create-store-webhook",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}/webhooks",
+      "access": "write",
+      "body": {
+        "name": "Orders",
+        "url": "https://shop.example.test/payments",
+        "event_types": [
+          "invoice.settled"
+        ],
+        "enabled": true,
+        "automatic_redelivery": true
+      },
+      "response": {
+        "signing_secret": "EXAMPLE_ONLY_SAVE_ONCE",
+        "endpoint": {
+          "id": "44444444-4444-4444-8444-444444444444",
+          "name": "Orders",
+          "enabled": true
+        },
+        "secret_visible_once": true
+      }
+    },
+    {
+      "name": "updateStoreWebhook",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/stores/{storeId}/webhooks/{webhookId}",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "storeId",
+        "webhookId"
+      ],
+      "id": "operator-update-store-webhook",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/stores/{store_id}/webhooks/{webhook_id}",
+      "access": "write",
+      "body": {
+        "name": "Orders",
+        "url": "https://shop.example.test/payments",
+        "event_types": [
+          "invoice.settled"
+        ],
+        "enabled": false,
+        "automatic_redelivery": true
+      },
+      "response": {
+        "id": "44444444-4444-4444-8444-444444444444",
+        "name": "Orders",
+        "enabled": true
+      }
+    },
+    {
+      "name": "listInvoices",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/invoices",
+      "ids": [
+        "merchantId",
+        "projectId"
+      ],
+      "id": "operator-list-invoices",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/invoices",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "limit": 25,
+          "offset": 0,
+          "total": 0,
+          "has_more": false
+        }
+      }
+    },
+    {
+      "name": "getInvoice",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/invoices/{invoiceId}",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "invoiceId"
+      ],
+      "id": "operator-get-invoice",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/invoices/{invoice_id}",
+      "access": "read",
+      "body": null,
+      "response": {
+        "invoice_id": "44444444-4444-4444-8444-444444444444",
+        "project_id": "33333333-3333-4333-8333-333333333333",
+        "amount": "25",
+        "currency": "EUR",
+        "status": "new",
+        "metadata": {},
+        "payment_intents": []
+      }
+    },
+    {
+      "name": "listWallets",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/wallets",
+      "ids": [
+        "merchantId",
+        "projectId"
+      ],
+      "id": "operator-list-wallets",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/wallets",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "listWalletAddresses",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/projects/{projectId}/wallets/{walletId}/addresses",
+      "ids": [
+        "merchantId",
+        "projectId",
+        "walletId"
+      ],
+      "id": "operator-list-wallet-addresses",
+      "public_path": "/v1/operator/merchants/{merchant_id}/projects/{project_id}/wallets/{wallet_id}/addresses",
+      "access": "read",
+      "body": null,
+      "response": {
+        "wallet": {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "chain_slug": "ethereum"
+        },
+        "items": [],
+        "total": 0,
+        "total_pages": 1,
+        "next_cursor": null,
+        "reporting_currency": "EUR",
+        "has_balance": true,
+        "hide_small_balances": true,
+        "small_balance_threshold": {
+          "amount": "0.20",
+          "currency": "EUR"
+        }
+      }
+    },
+    {
+      "name": "listMerchantCredentials",
+      "method": "GET",
+      "path": "/v1/operator/merchants/{merchantId}/api-credentials",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-list-merchant-credentials",
+      "public_path": "/v1/operator/merchants/{merchant_id}/api-credentials",
+      "access": "read",
+      "body": null,
+      "response": {
+        "data": [],
+        "page": 1,
+        "page_size": 25,
+        "total": 0
+      }
+    },
+    {
+      "name": "createMerchantCredential",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/api-credentials",
+      "ids": [
+        "merchantId"
+      ],
+      "id": "operator-create-merchant-credential",
+      "public_path": "/v1/operator/merchants/{merchant_id}/api-credentials",
+      "access": "write",
+      "body": {
+        "name": "Store integration",
+        "access_level": "read_only",
+        "enabled": true,
+        "ip_restriction_enabled": false,
+        "allowed_ips": [],
+        "project_ids": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      "response": {
+        "credential": {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "name": "Checkout",
+          "access_level": "read_only",
+          "project_ids": [
+            "33333333-3333-4333-8333-333333333333"
+          ],
+          "enabled": true
+        },
+        "token": "wc_live_EXAMPLE_ONLY_SAVE_ONCE"
+      }
+    },
+    {
+      "name": "updateMerchantCredential",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/api-credentials/{credentialId}",
+      "ids": [
+        "merchantId",
+        "credentialId"
+      ],
+      "id": "operator-update-merchant-credential",
+      "public_path": "/v1/operator/merchants/{merchant_id}/api-credentials/{credential_id}",
+      "access": "write",
+      "body": {
+        "name": "Checkout",
+        "access_level": "read_only",
+        "enabled": true,
+        "ip_restriction_enabled": false,
+        "allowed_ips": [],
+        "project_ids": [
+          "33333333-3333-4333-8333-333333333333"
+        ]
+      },
+      "response": {
+        "id": "22222222-2222-4222-8222-222222222222",
+        "name": "Checkout",
+        "access_level": "read_only",
+        "project_ids": [
+          "33333333-3333-4333-8333-333333333333"
+        ],
+        "enabled": true
+      }
+    },
+    {
+      "name": "rotateMerchantCredential",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/api-credentials/{credentialId}/rotate",
+      "ids": [
+        "merchantId",
+        "credentialId"
+      ],
+      "id": "operator-rotate-merchant-credential",
+      "public_path": "/v1/operator/merchants/{merchant_id}/api-credentials/{credential_id}/rotate",
+      "access": "write",
+      "body": {},
+      "response": {
+        "credential": {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "name": "Checkout",
+          "access_level": "read_only",
+          "project_ids": [
+            "33333333-3333-4333-8333-333333333333"
+          ],
+          "enabled": true
+        },
+        "token": "wc_live_EXAMPLE_ONLY_SAVE_ONCE"
+      }
+    },
+    {
+      "name": "revokeMerchantCredential",
+      "method": "POST",
+      "path": "/v1/operator/merchants/{merchantId}/api-credentials/{credentialId}/revoke",
+      "ids": [
+        "merchantId",
+        "credentialId"
+      ],
+      "id": "operator-revoke-merchant-credential",
+      "public_path": "/v1/operator/merchants/{merchant_id}/api-credentials/{credential_id}/revoke",
+      "access": "write",
+      "body": {},
+      "response": {
+        "revoked": true
+      }
+    }
+  ]
+}

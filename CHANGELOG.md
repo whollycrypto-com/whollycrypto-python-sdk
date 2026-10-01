@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.6.0 - 2026-10-01
+
+- Add a separate OperatorClient for the opt-in Operator API in Wholly Crypto 7.4.0: merchant/user onboarding, invitations, local credits, projects/stores, reporting and scoped credentials.
+- Add token-only invitation acceptance, explicit write retry keys, public route fixtures and signed lifecycle webhook examples. Ordinary merchant and invoice callbacks remain compatible.
+- Document permissions, tenant boundaries, one-time secrets and uncertain request recovery. Minimum supported runtimes are unchanged.
+
 ## 2.5.0 - 2026-09-20
 
 - Document merchant 5.6.0 store-specific checkout/API domains and unchanged signed callback links on retry.

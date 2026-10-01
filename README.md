@@ -1,12 +1,18 @@
 # Wholly Crypto Python SDK
 
+Operator integrations (Wholly Crypto 7.4.0+): use the separate `OperatorClient`
+to provision hosted merchants directly or by invitation, manage users, credits,
+projects/stores and signed lifecycle callbacks. See the [Operator API guide](docs/operator-api.md)
+and [onboarding example](examples/operator.py).
+Operator keys stay on your server and are never shared with hosted merchants.
+
 **Merchant 4 upgrade:** read `data.invoice_id` from invoice creation/detail and `invoice_id` from list rows. It matches the callback `invoice_id`. The server no longer returns `public_id`; internal `id` is not a checkout ID. Update custom response readers before upgrading your merchant. For older merchants, keep SDK 1.x or explicitly handle their older response shape.
 
 The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.5.0** targets API **v1**, tested against merchant **5.6.0**.
+SDK **2.6.0** targets API **v1**, tested against merchant **7.4.0**.
 SDK and merchant versions are independent.
 
 ## Install
@@ -21,7 +27,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.5.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.5.0.zip).
+1. [Download SDK 2.6.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.6.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:

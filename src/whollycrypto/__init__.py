@@ -3,6 +3,8 @@
 from ._version import __version__
 from .checkout import CheckoutClient
 from .client import Client
+from .operator import OperatorClient
+from .operator_onboarding import OperatorOnboardingClient
 from .exceptions import (
     APIError,
     InvalidResponseError,
@@ -17,6 +19,8 @@ from .webhooks import Notification, parse_notification, verify_signature
 __all__ = [
     "__version__",
     "Client",
+    "OperatorClient",
+    "OperatorOnboardingClient",
     "CheckoutClient",
     "Options",
     "Request",

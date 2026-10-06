@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.0 - 2026-10-06
+
+- Add a separate Marketplace client for merchant 8.0.0: 45 scoped routes for vendors, allocations, protected balances, payout approval, policies and signed events.
+- Exact decimal/atomic strings, explicit retry keys and project scope on every request. Existing Merchant and Operator clients keep their contracts.
+- Include inert multi-vendor invoice/payout examples and a signed Marketplace webhook receiver with duplicate-handling guidance.
 ## 2.6.0 - 2026-10-01
 
 - Add a separate OperatorClient for the opt-in Operator API in Wholly Crypto 7.4.0: merchant/user onboarding, invitations, local credits, projects/stores, reporting and scoped credentials.

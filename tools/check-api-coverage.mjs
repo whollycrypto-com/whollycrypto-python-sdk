@@ -17,7 +17,7 @@ const context = vm.createContext({});
 vm.runInContext(exampleSource, context, {timeout: 1000});
 vm.runInContext(catalogSource.slice(0, end) + '\nglobalThis.sdkCatalog = API_REFERENCE;})();', context, {timeout: 1000});
 const all = JSON.parse(JSON.stringify(context.sdkCatalog.endpoints));
-const current = all.filter(e => e.host === 'api' && e.surface !== 'operator');
+const current = all.filter(e => e.host === 'api' && !['operator','marketplace'].includes(e.surface));
 const fixture = JSON.parse(fixtureText);
 const shape = endpoint => [endpoint.id, endpoint.method, endpoint.path, endpoint.access];
 assert.deepEqual(current.map(shape).sort(), fixture.endpoints.map(shape).sort(), 'Merchant routes or access changed: update SDK methods, fixtures and release notes.');
@@ -37,3 +37,13 @@ for (const endpoint of routes) {
 }
 assert.deepEqual(all.filter(e=>e.path.startsWith('/v1/onboarding/')).map(e=>e.path).sort(),['/v1/onboarding/invitations/accept','/v1/onboarding/invitations/check']);
 console.log('PASS: 55 Operator methods and two token-only onboarding routes match the public reference.');
+
+const marketplace = JSON.parse(await readFile(new URL('../tests/fixtures/marketplace-v1.json', import.meta.url),'utf8'));
+const marketRoutes=all.filter(e=>e.surface==='marketplace');
+assert.deepEqual(marketRoutes.map(e=>[e.id,e.method,e.path,e.parameters.find(p=>p[0]==='permission')[2]]).sort(),marketplace.methods.map(e=>[e.id,e.method,e.public_path,e.access]).sort(),'Marketplace routes/scopes changed');
+for(const endpoint of marketRoutes){
+  const stored=marketplace.methods.find(e=>e.id===endpoint.id);
+  assert.deepEqual(endpoint.request.body??null,stored.body,endpoint.id+': Marketplace request drift');
+  assert.deepEqual(JSON.parse(endpoint.responseExample),stored.response,endpoint.id+': Marketplace response drift');
+}
+console.log('PASS: all '+marketRoutes.length+' Marketplace methods match the public reference.');

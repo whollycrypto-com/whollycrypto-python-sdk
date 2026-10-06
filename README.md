@@ -12,9 +12,20 @@ The official Python client for your **self-hosted Wholly Crypto merchant API**.
 Create invoices, check payments, manage accepted assets and verify IPN/webhooks.
 
 Python **3.10+**. Standard library only, with **no runtime dependencies**.
-SDK **2.6.0** targets API **v1**, tested against merchant **7.4.0**.
+SDK **2.7.0** targets API **v1**, tested against merchant **8.0.0**.
 SDK and merchant versions are independent.
 
+
+## Marketplace · merchant 8.0.0+
+
+Use the separate `MarketplaceClient` and a project-scoped `wc_marketplace_...` key
+for vendors, split invoices, protected balances, payout plans and signed events.
+BTC and supported EVM assets only. Keep spending keys on a trusted backend, never
+in customer JavaScript or a shipped mobile app. Writes require a saved retry key;
+preparing a payout does not authorize sending it.
+
+[Setup and safety](docs/marketplace-api.md) · [Invoice and payout example](examples/marketplace.py) ·
+[Signed event receiver](examples/marketplace_webhook.py) · [All endpoints](https://www.whollycrypto.com/api/#marketplace)
 ## Install
 
 ### With pip
@@ -27,7 +38,7 @@ Use a virtual environment for your application. Import the package as `whollycry
 
 ### Without pip (manual download)
 
-1. [Download SDK 2.6.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.6.0.zip).
+1. [Download SDK 2.7.0 as a ZIP](https://github.com/whollycrypto-com/whollycrypto-python-sdk/archive/refs/tags/v2.7.0.zip).
 2. Extract it and copy the complete **`src/whollycrypto/` folder** beside your
    application script. Keep the SDK's `LICENSE` with your copy. Do not copy only `__init__.py`.
 3. Import it normally. No pip, build tools or third-party packages are needed:

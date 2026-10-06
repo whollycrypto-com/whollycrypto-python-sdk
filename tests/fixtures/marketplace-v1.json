@@ -1,0 +1,912 @@
+{
+  "contract": "Wholly Crypto Marketplace API v1, merchant 8.0.0",
+  "methods": [
+    {
+      "id": "marketplace-capabilities",
+      "name": "capabilities",
+      "method": "GET",
+      "public_path": "/v1/marketplace/capabilities",
+      "path": "/v1/marketplace/capabilities",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-overview",
+      "name": "overview",
+      "method": "GET",
+      "public_path": "/v1/marketplace/overview",
+      "path": "/v1/marketplace/overview",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-settings",
+      "name": "settings",
+      "method": "GET",
+      "public_path": "/v1/marketplace/settings",
+      "path": "/v1/marketplace/settings",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-save-settings",
+      "name": "saveSettings",
+      "method": "POST",
+      "public_path": "/v1/marketplace/settings",
+      "path": "/v1/marketplace/settings",
+      "ids": [],
+      "access": "policies.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 0,
+        "enabled": true,
+        "payouts_paused": true,
+        "commission_percent": "4",
+        "stores": [
+          {
+            "store_id": "YOUR_STORE_ID",
+            "enabled": true,
+            "commission_percent": null
+          }
+        ]
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-list-vendors",
+      "name": "listVendors",
+      "method": "GET",
+      "public_path": "/v1/marketplace/vendors",
+      "path": "/v1/marketplace/vendors",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-create-vendor",
+      "name": "createVendor",
+      "method": "POST",
+      "public_path": "/v1/marketplace/vendors",
+      "path": "/v1/marketplace/vendors",
+      "ids": [],
+      "access": "vendors.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "name": "Example vendor",
+        "external_id": "vendor-1042",
+        "email": "vendor@example.com",
+        "description": "",
+        "status": "active",
+        "commission_percent": null
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-get-vendor",
+      "name": "getVendor",
+      "method": "GET",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}",
+      "path": "/v1/marketplace/vendors/{vendorId}",
+      "ids": [
+        "vendorId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-update-vendor",
+      "name": "updateVendor",
+      "method": "POST",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}/update",
+      "path": "/v1/marketplace/vendors/{vendorId}/update",
+      "ids": [
+        "vendorId"
+      ],
+      "access": "vendors.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "name": "Example vendor",
+        "external_id": "vendor-1042",
+        "email": "vendor@example.com",
+        "description": "",
+        "status": "active",
+        "commission_percent": null,
+        "revision": 1
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-archive-vendor",
+      "name": "archiveVendor",
+      "method": "POST",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}/archive",
+      "path": "/v1/marketplace/vendors/{vendorId}/archive",
+      "ids": [
+        "vendorId"
+      ],
+      "access": "vendors.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-list-destinations",
+      "name": "listDestinations",
+      "method": "GET",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}/destinations",
+      "path": "/v1/marketplace/vendors/{vendorId}/destinations",
+      "ids": [
+        "vendorId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-add-destination",
+      "name": "addDestination",
+      "method": "POST",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}/destinations",
+      "path": "/v1/marketplace/vendors/{vendorId}/destinations",
+      "ids": [
+        "vendorId"
+      ],
+      "access": "destinations.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "chain_slug": "bitcoin",
+        "network": "mainnet",
+        "address": "VERIFIED_VENDOR_BTC_ADDRESS",
+        "label": "Vendor BTC"
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-approve-destination",
+      "name": "approveDestination",
+      "method": "POST",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}/destinations/{destination_id}/approve",
+      "path": "/v1/marketplace/vendors/{vendorId}/destinations/{destinationId}/approve",
+      "ids": [
+        "vendorId",
+        "destinationId"
+      ],
+      "access": "destinations.approve",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-disable-destination",
+      "name": "disableDestination",
+      "method": "POST",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}/destinations/{destination_id}/disable",
+      "path": "/v1/marketplace/vendors/{vendorId}/destinations/{destinationId}/disable",
+      "ids": [
+        "vendorId",
+        "destinationId"
+      ],
+      "access": "destinations.approve",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-vendor-balances",
+      "name": "vendorBalances",
+      "method": "GET",
+      "public_path": "/v1/marketplace/vendors/{vendor_id}/balances",
+      "path": "/v1/marketplace/vendors/{vendorId}/balances",
+      "ids": [
+        "vendorId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-list-invoices",
+      "name": "listInvoices",
+      "method": "GET",
+      "public_path": "/v1/marketplace/invoices",
+      "path": "/v1/marketplace/invoices",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-create-invoice",
+      "name": "createInvoice",
+      "method": "POST",
+      "public_path": "/v1/marketplace/invoices",
+      "path": "/v1/marketplace/invoices",
+      "ids": [],
+      "access": "invoices.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "store_id": "YOUR_STORE_ID",
+        "amount": "300.00",
+        "currency": "USD",
+        "order_id": "cart-1042",
+        "allocations": [
+          {
+            "vendor_id": "VENDOR_A_UUID",
+            "gross_amount": "100.00"
+          },
+          {
+            "vendor_id": "VENDOR_B_UUID",
+            "gross_amount": "100.00"
+          },
+          {
+            "vendor_id": "VENDOR_C_UUID",
+            "gross_amount": "100.00"
+          }
+        ]
+      },
+      "response": {
+        "data": {
+          "invoice_id": "YOUR_INVOICE_ID",
+          "status": "new",
+          "marketplace": {
+            "state": "pending",
+            "allocations": []
+          }
+        },
+        "links": {
+          "checkout": "https://pay.example.com/invoice/YOUR_INVOICE_ID"
+        }
+      }
+    },
+    {
+      "id": "marketplace-get-invoice",
+      "name": "getInvoice",
+      "method": "GET",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}",
+      "path": "/v1/marketplace/invoices/{invoiceId}",
+      "ids": [
+        "invoiceId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-invoice-payments",
+      "name": "invoicePayments",
+      "method": "GET",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}/payments",
+      "path": "/v1/marketplace/invoices/{invoiceId}/payments",
+      "ids": [
+        "invoiceId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-invoice-allocations",
+      "name": "invoiceAllocations",
+      "method": "GET",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}/allocations",
+      "path": "/v1/marketplace/invoices/{invoiceId}/allocations",
+      "ids": [
+        "invoiceId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-cancel-invoice",
+      "name": "cancelInvoice",
+      "method": "POST",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}/cancel",
+      "path": "/v1/marketplace/invoices/{invoiceId}/cancel",
+      "ids": [
+        "invoiceId"
+      ],
+      "access": "invoices.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-hold-invoice",
+      "name": "holdInvoice",
+      "method": "POST",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}/allocations/hold",
+      "path": "/v1/marketplace/invoices/{invoiceId}/allocations/hold",
+      "ids": [
+        "invoiceId"
+      ],
+      "access": "reconciliation.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1,
+        "reason": "Verify customer request"
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-release-invoice",
+      "name": "releaseInvoice",
+      "method": "POST",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}/allocations/release",
+      "path": "/v1/marketplace/invoices/{invoiceId}/allocations/release",
+      "ids": [
+        "invoiceId"
+      ],
+      "access": "reconciliation.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1,
+        "reason": "Verified payment evidence"
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-rebind-destination",
+      "name": "rebindDestination",
+      "method": "POST",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}/allocations/{allocation_id}/destination",
+      "path": "/v1/marketplace/invoices/{invoiceId}/allocations/{allocationId}/destination",
+      "ids": [
+        "invoiceId",
+        "allocationId"
+      ],
+      "access": "reconciliation.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1,
+        "destination_id": "YOUR_DESTINATION_ID",
+        "reason": "Vendor verified replacement address"
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-refund-invoice",
+      "name": "refundInvoice",
+      "method": "POST",
+      "public_path": "/v1/marketplace/invoices/{invoice_id}/refund",
+      "path": "/v1/marketplace/invoices/{invoiceId}/refund",
+      "ids": [
+        "invoiceId"
+      ],
+      "access": "reconciliation.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1,
+        "payment_method_id": "YOUR_PAYMENT_METHOD_ID",
+        "destination_address": "VERIFIED_CUSTOMER_REFUND_ADDRESS",
+        "reason": "Customer cancellation",
+        "maximum_network_fee_atomic": "10000",
+        "maximum_gas_funding_atomic": "0",
+        "fee_tier": "medium"
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-allocations",
+      "name": "allocations",
+      "method": "GET",
+      "public_path": "/v1/marketplace/allocations",
+      "path": "/v1/marketplace/allocations",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-balances",
+      "name": "balances",
+      "method": "GET",
+      "public_path": "/v1/marketplace/balances",
+      "path": "/v1/marketplace/balances",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-ledger",
+      "name": "ledger",
+      "method": "GET",
+      "public_path": "/v1/marketplace/ledger",
+      "path": "/v1/marketplace/ledger",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-list-payouts",
+      "name": "listPayouts",
+      "method": "GET",
+      "public_path": "/v1/marketplace/payouts",
+      "path": "/v1/marketplace/payouts",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-preview-payout",
+      "name": "previewPayout",
+      "method": "POST",
+      "public_path": "/v1/marketplace/payouts/preview",
+      "path": "/v1/marketplace/payouts/preview",
+      "ids": [],
+      "access": "payouts.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "allocation_ids": [
+          "YOUR_ALLOCATION_ID"
+        ],
+        "maximum_network_fee_atomic": "10000",
+        "maximum_gas_funding_atomic": "0",
+        "fee_tier": "medium"
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-create-payout",
+      "name": "createPayout",
+      "method": "POST",
+      "public_path": "/v1/marketplace/payouts",
+      "path": "/v1/marketplace/payouts",
+      "ids": [],
+      "access": "payouts.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "allocation_ids": [
+          "YOUR_ALLOCATION_ID"
+        ],
+        "maximum_network_fee_atomic": "10000",
+        "maximum_gas_funding_atomic": "0",
+        "fee_tier": "medium"
+      },
+      "response": {
+        "data": {
+          "id": "YOUR_PAYOUT_ID",
+          "state": "awaiting_approval",
+          "revision": 1,
+          "plan_hash": "RETAINED_PLAN_HASH",
+          "plan": {
+            "amount_atomic": "28800000",
+            "maximum_network_fee_atomic": "10000",
+            "maximum_gas_funding_atomic": "0",
+            "items": []
+          },
+          "transactions": []
+        }
+      }
+    },
+    {
+      "id": "marketplace-get-payout",
+      "name": "getPayout",
+      "method": "GET",
+      "public_path": "/v1/marketplace/payouts/{payout_id}",
+      "path": "/v1/marketplace/payouts/{payoutId}",
+      "ids": [
+        "payoutId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {
+          "id": "YOUR_PAYOUT_ID",
+          "state": "awaiting_approval",
+          "revision": 1,
+          "plan_hash": "RETAINED_PLAN_HASH",
+          "plan": {
+            "amount_atomic": "28800000",
+            "maximum_network_fee_atomic": "10000",
+            "maximum_gas_funding_atomic": "0",
+            "items": []
+          },
+          "transactions": []
+        }
+      }
+    },
+    {
+      "id": "marketplace-approve-payout",
+      "name": "approvePayout",
+      "method": "POST",
+      "public_path": "/v1/marketplace/payouts/{payout_id}/approve",
+      "path": "/v1/marketplace/payouts/{payoutId}/approve",
+      "ids": [
+        "payoutId"
+      ],
+      "access": "payouts.approve",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1,
+        "expected_plan_hash": "COPY_EXACT_PLAN_HASH_FROM_PREPARE",
+        "confirm": true
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-resume-payout",
+      "name": "resumePayout",
+      "method": "POST",
+      "public_path": "/v1/marketplace/payouts/{payout_id}/resume",
+      "path": "/v1/marketplace/payouts/{payoutId}/resume",
+      "ids": [
+        "payoutId"
+      ],
+      "access": "payouts.approve",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1,
+        "expected_plan_hash": "COPY_EXACT_PLAN_HASH_FROM_PREPARE",
+        "confirm": true
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-cancel-payout",
+      "name": "cancelPayout",
+      "method": "POST",
+      "public_path": "/v1/marketplace/payouts/{payout_id}/cancel",
+      "path": "/v1/marketplace/payouts/{payoutId}/cancel",
+      "ids": [
+        "payoutId"
+      ],
+      "access": "payouts.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-list-policies",
+      "name": "listPolicies",
+      "method": "GET",
+      "public_path": "/v1/marketplace/policies",
+      "path": "/v1/marketplace/policies",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": []
+      }
+    },
+    {
+      "id": "marketplace-save-policy",
+      "name": "savePolicy",
+      "method": "POST",
+      "public_path": "/v1/marketplace/policies",
+      "path": "/v1/marketplace/policies",
+      "ids": [],
+      "access": "policies.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "asset_id": "YOUR_ASSET_ID",
+        "revision": 0,
+        "enabled": false,
+        "minimum_atomic": "100000",
+        "transfer_limit_atomic": "10000000",
+        "daily_limit_atomic": "30000000",
+        "fee_limit_atomic": "10000",
+        "daily_fee_limit_atomic": "30000",
+        "gas_limit_atomic": "0",
+        "daily_gas_limit_atomic": "0",
+        "interval_seconds": 3600,
+        "minimum_confirmations": 2
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-list-webhooks",
+      "name": "listWebhooks",
+      "method": "GET",
+      "public_path": "/v1/marketplace/webhooks",
+      "path": "/v1/marketplace/webhooks",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {
+          "endpoints": [],
+          "event_types": [
+            "marketplace.invoice.created",
+            "marketplace.allocations.available",
+            "marketplace.allocations.held",
+            "marketplace.payout.approved",
+            "marketplace.payout.broadcast",
+            "marketplace.payout.confirmed",
+            "marketplace.payout.partial",
+            "marketplace.payout.failed",
+            "marketplace.payout.cancelled",
+            "marketplace.refund.prepared",
+            "marketplace.refund.confirmed"
+          ]
+        }
+      }
+    },
+    {
+      "id": "marketplace-create-webhook",
+      "name": "createWebhook",
+      "method": "POST",
+      "public_path": "/v1/marketplace/webhooks",
+      "path": "/v1/marketplace/webhooks",
+      "ids": [],
+      "access": "webhooks.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "url": "https://shop.example.com/marketplace-events",
+        "enabled": true,
+        "events": [
+          "marketplace.payout.confirmed",
+          "marketplace.payout.failed"
+        ]
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-update-webhook",
+      "name": "updateWebhook",
+      "method": "POST",
+      "public_path": "/v1/marketplace/webhooks/{webhook_id}/update",
+      "path": "/v1/marketplace/webhooks/{webhookId}/update",
+      "ids": [
+        "webhookId"
+      ],
+      "access": "webhooks.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1,
+        "url": "https://shop.example.com/marketplace-events",
+        "enabled": true,
+        "events": [
+          "marketplace.payout.confirmed"
+        ]
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-disable-webhook",
+      "name": "disableWebhook",
+      "method": "POST",
+      "public_path": "/v1/marketplace/webhooks/{webhook_id}/disable",
+      "path": "/v1/marketplace/webhooks/{webhookId}/disable",
+      "ids": [
+        "webhookId"
+      ],
+      "access": "webhooks.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "revision": 1
+      },
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-list-events",
+      "name": "listEvents",
+      "method": "GET",
+      "public_path": "/v1/marketplace/events",
+      "path": "/v1/marketplace/events",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-get-event",
+      "name": "getEvent",
+      "method": "GET",
+      "public_path": "/v1/marketplace/events/{event_id}",
+      "path": "/v1/marketplace/events/{eventId}",
+      "ids": [
+        "eventId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {
+          "event_id": "11111111-1111-4111-8111-111111111111",
+          "event_type": "marketplace.payout.confirmed",
+          "payload_version": 1,
+          "project_id": "YOUR_PROJECT_ID",
+          "occurred_at": "2026-10-06T12:00:00Z",
+          "data": {
+            "payout_id": "YOUR_PAYOUT_ID",
+            "asset_id": "YOUR_ASSET_ID",
+            "amount_atomic": "28800000",
+            "transactions": [
+              {
+                "transaction_id": "EXAMPLE_TRANSACTION_ID",
+                "explorer_url": "https://mempool.space/tx/EXAMPLE_TRANSACTION_ID"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "marketplace-list-deliveries",
+      "name": "listDeliveries",
+      "method": "GET",
+      "public_path": "/v1/marketplace/webhook-deliveries",
+      "path": "/v1/marketplace/webhook-deliveries",
+      "ids": [],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": [],
+        "pagination": {
+          "page": 1,
+          "per_page": 25,
+          "total": 0,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "marketplace-get-delivery",
+      "name": "getDelivery",
+      "method": "GET",
+      "public_path": "/v1/marketplace/webhook-deliveries/{delivery_id}",
+      "path": "/v1/marketplace/webhook-deliveries/{deliveryId}",
+      "ids": [
+        "deliveryId"
+      ],
+      "access": "marketplace.read",
+      "body": null,
+      "response": {
+        "data": {}
+      }
+    },
+    {
+      "id": "marketplace-resend-delivery",
+      "name": "resendDelivery",
+      "method": "POST",
+      "public_path": "/v1/marketplace/webhook-deliveries/{delivery_id}/resend",
+      "path": "/v1/marketplace/webhook-deliveries/{deliveryId}/resend",
+      "ids": [
+        "deliveryId"
+      ],
+      "access": "webhooks.write",
+      "body": {
+        "project_id": "YOUR_PROJECT_ID",
+        "confirm": true
+      },
+      "response": {
+        "data": {}
+      }
+    }
+  ]
+}

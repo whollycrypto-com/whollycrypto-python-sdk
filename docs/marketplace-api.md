@@ -1,5 +1,27 @@
 # Marketplace API
 
+## Merchant 8.1 safety rules
+
+- Changing or removing a vendor commission needs `commissions.override` as
+  well as `vendors.write`. Invoice commission overrides need the same financial
+  scope. An unchanged commission does not add a permission requirement.
+- Overpayments alone do not block quoted vendor shares on Bitcoin or supported
+  EVM coins/ERC-20 tokens. Excess stays separate; payouts never reprice the split.
+  Keep separate native funds for fees and Bitcoin change dust if needed.
+- A vendor with open or unpaid obligations cannot be archived. To restore an
+  already archived vendor, call update with active/suspended status and
+  `reconciliation.write`; existing allocations are unchanged.
+- Explicit resume can replace only a sufficiently confirmed canonical EVM revert
+  proven by two independent providers. Original hashes/fees stay recorded and
+  consume the original fee cap. Unknown outcomes or partial token delivery stay
+  held (`payout_recovery_unverified`); never create a second payout to bypass it.
+- Automatic policies defer credit pauses fairly and hold invalid whole invoice
+  groups without blocking other eligible invoices.
+
+Existing clients use the same routes and request shapes; no SDK upgrade is
+required for these server-side fixes. Follow the public reference linked below.
+
+
 Requires merchant **8.0.0+**, Marketplace enabled for the project and a separate
 `wc_marketplace_...` key from Settings → API access. Ordinary merchant, Operator
 and MCP keys do not grant payouts. Keep this client on a trusted backend;

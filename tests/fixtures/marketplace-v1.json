@@ -1,5 +1,5 @@
 {
-  "contract": "Wholly Crypto Marketplace API v1, merchant 8.0.0",
+  "contract": "Wholly Crypto Marketplace API v1, merchant 8.1.0 (compatible with 8.0 routes)",
   "methods": [
     {
       "id": "marketplace-capabilities",
